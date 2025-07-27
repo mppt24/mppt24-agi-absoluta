@@ -332,7 +332,127 @@ class MPPT24_Absoluta:
             self.salvar_conversa(mensagem, resposta)
             return resposta
         
-        # MATEMÁTICA
+        # FUNCIONALIDADES AVANÇADAS
+        
+        # CALCULADORA CIENTÍFICA AVANÇADA
+        if mensagem.startswith("calcular ") or mensagem.startswith("calcula "):
+            import math
+            import re
+            
+            expressao = mensagem.replace("calcular ", "").replace("calcula ", "")
+            
+            try:
+                # Substituições para tornar expressões mais naturais
+                expressao = expressao.replace("x", "*")
+                expressao = expressao.replace("÷", "/")
+                expressao = expressao.replace("×", "*")
+                expressao = expressao.replace("^", "**")
+                expressao = expressao.replace("pi", str(math.pi))
+                expressao = expressao.replace("e", str(math.e))
+                
+                # Funções matemáticas
+                expressao = re.sub(r'sqrt\(([^)]+)\)', r'math.sqrt(\1)', expressao)
+                expressao = re.sub(r'sin\(([^)]+)\)', r'math.sin(\1)', expressao)
+                expressao = re.sub(r'cos\(([^)]+)\)', r'math.cos(\1)', expressao)
+                expressao = re.sub(r'tan\(([^)]+)\)', r'math.tan(\1)', expressao)
+                expressao = re.sub(r'log\(([^)]+)\)', r'math.log(\1)', expressao)
+                expressao = re.sub(r'ln\(([^)]+)\)', r'math.log(\1)', expressao)
+                
+                resultado = eval(expressao)
+                resposta = f"🧮 Resultado: {resultado}"
+                self.salvar_conversa(mensagem, resposta)
+                return resposta
+            except:
+                resposta = "🧮 Erro no cálculo. Tenta algo como: calcular 2+2, sqrt(16), sin(pi/2)"
+                self.salvar_conversa(mensagem, resposta)
+                return resposta
+        
+        # TRADUTOR MULTI-IDIOMAS
+        if mensagem.startswith("traduzir ") or mensagem.startswith("traduz "):
+            texto_traduzir = mensagem.replace("traduzir ", "").replace("traduz ", "")
+            
+            # Traduções básicas português-inglês-espanhol
+            traducoes = {
+                "olá": "🌐 Tradução: Hello (EN), Hola (ES), Bonjour (FR), Ciao (IT)",
+                "obrigado": "🌐 Tradução: Thank you (EN), Gracias (ES), Merci (FR), Grazie (IT)",
+                "amor": "🌐 Tradução: Love (EN), Amor (ES), Amour (FR), Amore (IT)",
+                "água": "🌐 Tradução: Water (EN), Agua (ES), Eau (FR), Acqua (IT)",
+                "casa": "🌐 Tradução: House (EN), Casa (ES), Maison (FR), Casa (IT)",
+                "carro": "🌐 Tradução: Car (EN), Coche (ES), Voiture (FR), Auto (IT)",
+                "comida": "🌐 Tradução: Food (EN), Comida (ES), Nourriture (FR), Cibo (IT)",
+                "família": "🌐 Tradução: Family (EN), Familia (ES), Famille (FR), Famiglia (IT)",
+                "trabalho": "🌐 Tradução: Work (EN), Trabajo (ES), Travail (FR), Lavoro (IT)",
+                "escola": "🌐 Tradução: School (EN), Escuela (ES), École (FR), Scuola (IT)",
+            }
+            
+            if texto_traduzir in traducoes:
+                resposta = traducoes[texto_traduzir]
+            else:
+                resposta = "🌐 Tradução: Palavra não encontrada. Tenta: olá, obrigado, amor, água, casa"
+            
+            self.salvar_conversa(mensagem, resposta)
+            return resposta
+        
+        # CONVERSOR DE UNIDADES
+        if mensagem.startswith("converter ") or mensagem.startswith("converte "):
+            conversao = mensagem.replace("converter ", "").replace("converte ", "")
+            
+            conversores = {
+                "1 metro em cm": "🔄 Conversão: 1 metro = 100 centímetros",
+                "1 km em metros": "🔄 Conversão: 1 quilómetro = 1000 metros",
+                "1 kg em gramas": "🔄 Conversão: 1 quilograma = 1000 gramas",
+                "1 litro em ml": "🔄 Conversão: 1 litro = 1000 mililitros",
+                "celsius fahrenheit": "🔄 Conversão: °C para °F = (°C × 9/5) + 32",
+                "fahrenheit celsius": "🔄 Conversão: °F para °C = (°F - 32) × 5/9",
+                "1 hora em minutos": "🔄 Conversão: 1 hora = 60 minutos",
+                "1 dia em horas": "🔄 Conversão: 1 dia = 24 horas",
+                "1 ano em dias": "🔄 Conversão: 1 ano = 365 dias",
+                "1 euro em dolares": "🔄 Conversão: ~1 EUR = 1.10 USD (varia diariamente)",
+            }
+            
+            resposta_encontrada = None
+            for chave, valor in conversores.items():
+                if chave in conversao:
+                    resposta_encontrada = valor
+                    break
+            
+            if resposta_encontrada:
+                resposta = resposta_encontrada
+            else:
+                resposta = "🔄 Conversão: Não encontrada. Tenta: metro em cm, kg em gramas, celsius fahrenheit"
+            
+            self.salvar_conversa(mensagem, resposta)
+            return resposta
+        
+        # GERADOR DE SENHAS SEGURAS
+        if "gerar senha" in mensagem or "criar senha" in mensagem:
+            import random
+            import string
+            
+            caracteres = string.ascii_letters + string.digits + "!@#$%&*"
+            senha = ''.join(random.choice(caracteres) for _ in range(12))
+            resposta = f"🔐 Senha segura gerada: {senha}"
+            self.salvar_conversa(mensagem, resposta)
+            return resposta
+        
+        # INFORMAÇÕES DO SISTEMA
+        if "que horas" in mensagem or "hora atual" in mensagem:
+            from datetime import datetime
+            agora = datetime.now()
+            resposta = f"🕐 Hora atual: {agora.strftime('%H:%M:%S de %d/%m/%Y')}"
+            self.salvar_conversa(mensagem, resposta)
+            return resposta
+        
+        if "data hoje" in mensagem or "que dia" in mensagem:
+            from datetime import datetime
+            hoje = datetime.now()
+            dias_semana = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado", "Domingo"]
+            dia_semana = dias_semana[hoje.weekday()]
+            resposta = f"📅 Hoje é {dia_semana}, {hoje.strftime('%d/%m/%Y')}"
+            self.salvar_conversa(mensagem, resposta)
+            return resposta
+        
+        # MATEMÁTICA AVANÇADA
         if "derivada" in mensagem and ("x²+5x+3" in mensagem or "x2+5x+3" in mensagem):
             resposta = "🧮 Matemática: A derivada de x²+5x+3 é 2x+5"
             self.salvar_conversa(mensagem, resposta)
@@ -375,6 +495,163 @@ class MPPT24_Absoluta:
             "mercurio": "⚗️ Química: Mercúrio (Hg) elemento 80, líquido temperatura ambiente, tóxico, termómetros antigos",
             "chumbo": "⚗️ Química: Chumbo (Pb) elemento 82, pesado, tóxico, baterias, radiação",
             "uranio": "⚗️ Química: Urânio (U) elemento 92, radioativo, energia nuclear, bombas",
+            "plutonio": "⚗️ Química: Plutónio (Pu) elemento 94, artificial, armas nucleares, reatores",
+            "americio": "⚗️ Química: Amerício (Am) elemento 95, detectores fumo, transurânico",
+            "curio": "⚗️ Química: Cúrio (Cm) elemento 96, homenagem Marie Curie, radioativo",
+            "berkelio": "⚗️ Química: Berquélio (Bk) elemento 97, Berkeley, meia-vida curta",
+            "californio": "⚗️ Química: Califórnio (Cf) elemento 98, fonte neutrões, medicina nuclear",
+            "einstenio": "⚗️ Química: Einstênio (Es) elemento 99, homenagem Einstein, sintético",
+            "fermio": "⚗️ Química: Férmio (Fm) elemento 100, homenagem Fermi, bomba hidrogénio",
+            "mendelevio": "⚗️ Química: Mendelévio (Md) elemento 101, homenagem Mendeleev, acelerador",
+            "nobelio": "⚗️ Química: Nobélio (No) elemento 102, homenagem Nobel, instável",
+            "laurencio": "⚗️ Química: Laurêncio (Lr) elemento 103, Lawrence Berkeley, actinídeo final",
+            "rutherfordio": "⚗️ Química: Rutherfórdio (Rf) elemento 104, homenagem Rutherford, transactinídeo",
+            "dubnio": "⚗️ Química: Dúbnio (Db) elemento 105, Dubna Rússia, meia-vida segundos",
+            "seaborgio": "⚗️ Química: Seabórgio (Sg) elemento 106, homenagem Seaborg, super-pesado",
+            "bohrio": "⚗️ Química: Bóhrio (Bh) elemento 107, homenagem Bohr, instável",
+            "hassio": "⚗️ Química: Hássio (Hs) elemento 108, Hesse Alemanha, milissegundos",
+            "meitnerio": "⚗️ Química: Meitnério (Mt) elemento 109, homenagem Lise Meitner, sintético",
+            "darmstadtio": "⚗️ Química: Darmstádtio (Ds) elemento 110, Darmstadt Alemanha, GSI",
+            "roentgenio": "⚗️ Química: Roentgênio (Rg) elemento 111, homenagem Röntgen, raios-X",
+            "copernicio": "⚗️ Química: Copernício (Cn) elemento 112, homenagem Copérnico, líquido",
+            "nihonio": "⚗️ Química: Nihônio (Nh) elemento 113, Japão Nihon, RIKEN",
+            "flerovio": "⚗️ Química: Fleróvio (Fl) elemento 114, Flerov laboratório, ilha estabilidade",
+            "moscovio": "⚗️ Química: Moscóvio (Mc) elemento 115, Moscovo Rússia, super-pesado",
+            "livermorio": "⚗️ Química: Livermório (Lv) elemento 116, Livermore laboratório, sintético",
+            "tenessino": "⚗️ Química: Tenessino (Ts) elemento 117, Tennessee EUA, halogéneo",
+            "oganessao": "⚗️ Química: Oganessão (Og) elemento 118, homenagem Oganessian, gás nobre",
+            
+            # MEDICINA E SAÚDE ESPECÍFICA
+            "dna": "🧬 Medicina: DNA ácido desoxirribonucleico, código genético, dupla hélice Watson-Crick",
+            "rna": "🧬 Medicina: RNA ácido ribonucleico, síntese proteínas, mRNA/tRNA/rRNA",
+            "proteina": "🧬 Medicina: Proteína macromolécula aminoácidos, enzimas, estrutura, função",
+            "enzima": "🧬 Medicina: Enzima catalisador biológico, acelera reações, específica substrato",
+            "hormona": "🧬 Medicina: Hormona mensageiro químico, insulina, adrenalina, crescimento",
+            "anticorpo": "🧬 Medicina: Anticorpo proteína defesa, imunoglobulina, antígeno específico",
+            "vacina": "💉 Medicina: Vacina previne doenças, imunização, Jenner varíola, COVID-19",
+            "antibiotico": "💊 Medicina: Antibiótico combate bactérias, penicilina Fleming, resistência",
+            "aspirina": "💊 Medicina: Aspirina ácido acetilsalicílico, analgésico, anti-inflamatório, coração",
+            "insulina": "💊 Medicina: Insulina hormona diabetes, pâncreas, glucose sangue, Banting",
+            "morfina": "💊 Medicina: Morfina analgésico opióide, dor severa, ópio papoila, viciante",
+            "penicilina": "💊 Medicina: Penicilina primeiro antibiótico, Fleming 1928, salvou milhões",
+            "coracao": "❤️ Medicina: Coração bomba sangue, 4 câmaras, átrios ventrículos, marca-passo",
+            "cerebro": "🧠 Medicina: Cérebro centro nervoso, neurónios, córtex, 100 bilhões células",
+            "figado": "🫀 Medicina: Fígado maior órgão interno, desintoxica, bile, regeneração",
+            "rim": "🫘 Medicina: Rim filtra sangue, urina, néfrons, pressão arterial, equilíbrio",
+            "pulmao": "🫁 Medicina: Pulmão troca gasosa, alvéolos, oxigénio CO2, respiração",
+            "cancer": "🎗️ Medicina: Cancro células malignas, oncologia, quimioterapia, metástase",
+            "diabetes": "🩸 Medicina: Diabetes glucose elevada, tipo 1/2, insulina, complicações",
+            "hipertensao": "🩸 Medicina: Hipertensão pressão alta, silenciosa, AVC, coração",
+            "alzheimer": "🧠 Medicina: Alzheimer demência, perda memória, placas amilóide, idade",
+            "parkinson": "🧠 Medicina: Parkinson tremor, dopamina, movimento, rigidez",
+            "covid": "🦠 Medicina: COVID-19 SARS-CoV-2, pandemia 2020, vacinas mRNA, variantes",
+            "gripe": "🦠 Medicina: Gripe influenza, sazonal, H1N1, vacinação anual",
+            "malaria": "🦠 Medicina: Malária parasita Plasmodium, mosquito Anopheles, febres",
+            "tuberculose": "🦠 Medicina: Tuberculose Mycobacterium, pulmões, Koch, antibióticos",
+            "sida": "🦠 Medicina: SIDA HIV, sistema imunitário, retrovírus, antirretrovirais",
+            
+            # BIOLOGIA AVANÇADA
+            "evolucao": "🧬 Biologia: Evolução Darwin, seleção natural, espécies, adaptação",
+            "genetica": "🧬 Biologia: Genética Mendel, hereditariedade, genes, cromossomas",
+            "mitose": "🧬 Biologia: Mitose divisão celular, crescimento, cromossomas duplicam",
+            "meiose": "🧬 Biologia: Meiose divisão sexual, gâmetas, variabilidade genética",
+            "fotossintese": "🌱 Biologia: Fotossíntese plantas, clorofila, CO2 + H2O → glucose + O2",
+            "respiracao": "🌱 Biologia: Respiração celular, glucose + O2 → ATP + CO2 + H2O",
+            "ecosistema": "🌍 Biologia: Ecossistema comunidade organismos, cadeia alimentar, equilíbrio",
+            "biodiversidade": "🌍 Biologia: Biodiversidade variedade vida, espécies, conservação",
+            "extincao": "🦕 Biologia: Extinção desaparecimento espécies, dinossauros, dodo, atual",
+            "clonagem": "🧬 Biologia: Clonagem cópia genética, Dolly ovelha, células estaminais",
+            "crispr": "🧬 Biologia: CRISPR edição genética, Cas9, terapia génica, revolução",
+            
+            # MATEMÁTICA AVANÇADA
+            "pi": "🔢 Matemática: Pi (π) 3.14159..., círculo, irracional, Arquimedes",
+            "euler": "🔢 Matemática: Número Euler (e) 2.71828..., logaritmo natural, crescimento",
+            "fibonacci": "🔢 Matemática: Fibonacci 1,1,2,3,5,8..., natureza, proporção áurea",
+            "infinito": "🔢 Matemática: Infinito (∞) conceito sem limite, Cantor, paradoxos",
+            "zero": "🔢 Matemática: Zero invenção indiana, Brahmagupta, revolução matemática",
+            "algebra": "🔢 Matemática: Álgebra Al-Khwarizmi, equações, incógnitas, abstração",
+            "calculo": "🔢 Matemática: Cálculo Newton/Leibniz, derivadas, integrais, mudança",
+            "geometria": "🔢 Matemática: Geometria Euclides, formas, espaço, teoremas",
+            "estatistica": "🔢 Matemática: Estatística dados, probabilidade, média, desvio",
+            "topologia": "🔢 Matemática: Topologia propriedades espaço, continuidade, deformação",
+            "teoria numeros": "🔢 Matemática: Teoria Números primos, Fermat, Riemann, criptografia",
+            "fractais": "🔢 Matemática: Fractais Mandelbrot, auto-similaridade, dimensão fracionária",
+            
+            # HISTÓRIA MUNDIAL ESPECÍFICA
+            "roma": "🏛️ História: Roma império antigo, César, Augusto, direito, aquedutos, 476 d.C.",
+            "grecia": "🏛️ História: Grécia berço democracia, filosofia, Atenas, Esparta, Alexandre",
+            "egipto": "🏛️ História: Egito pirâmides, faraós, Nilo, hieróglifos, múmias",
+            "china": "🏛️ História: China império milenar, Grande Muralha, pólvora, papel, seda",
+            "india": "🏛️ História: Índia civilização Indo, budismo, hinduísmo, Mahatma Gandhi",
+            "revolucao francesa": "🏛️ História: Revolução Francesa 1789, Bastilha, guilhotina, direitos humanos",
+            "revolucao industrial": "🏛️ História: Revolução Industrial máquina vapor, fábricas, urbanização",
+            "primeira guerra": "🏛️ História: Primeira Guerra Mundial 1914-1918, trincheiras, gás, 20 milhões mortos",
+            "segunda guerra": "🏛️ História: Segunda Guerra Mundial 1939-1945, Holocausto, bomba atómica, 70 milhões",
+            "guerra fria": "🏛️ História: Guerra Fria EUA vs URSS, nuclear, Berlim, espaço",
+            "descobrimentos": "🏛️ História: Descobrimentos portugueses, Vasco Gama, Brasil, especiarias",
+            "renascimento": "🏛️ História: Renascimento arte/ciência, Leonardo, Michelangelo, humanismo",
+            "iluminismo": "🏛️ História: Iluminismo razão, Voltaire, Rousseau, enciclopédia",
+            "abolicionismo": "🏛️ História: Abolicionismo fim escravatura, Lincoln, 13ª emenda, direitos",
+            
+            # FILOSOFIA ESPECÍFICA
+            "socrates": "🤔 Filosofia: Sócrates 'só sei que nada sei', maiêutica, Atenas, cicuta",
+            "platao": "🤔 Filosofia: Platão mundo ideias, República, Academia, discípulo Sócrates",
+            "aristoteles": "🤔 Filosofia: Aristóteles lógica, ética, política, tutor Alexandre",
+            "descartes": "🤔 Filosofia: Descartes 'penso logo existo', dualismo, método científico",
+            "kant": "🤔 Filosofia: Kant imperativo categórico, crítica razão, moral universal",
+            "nietzsche": "🤔 Filosofia: Nietzsche 'Deus morreu', super-homem, vontade poder",
+            "existencialismo": "🤔 Filosofia: Existencialismo Sartre, liberdade, angústia, autenticidade",
+            "estoicismo": "🤔 Filosofia: Estoicismo Marco Aurélio, virtude, aceitação, controlo",
+            "budismo": "🤔 Filosofia: Budismo Buda, sofrimento, iluminação, karma, nirvana",
+            "confucionismo": "🤔 Filosofia: Confucionismo Confúcio, harmonia social, respeito, educação",
+            
+            # ARTE E CULTURA ESPECÍFICA
+            "mona lisa": "🎨 Arte: Mona Lisa Leonardo da Vinci, Louvre, sorriso enigmático, Renascimento",
+            "guernica": "🎨 Arte: Guernica Picasso, guerra civil espanhola, cubismo, anti-guerra",
+            "noite estrelada": "🎨 Arte: Noite Estrelada Van Gogh, pós-impressionismo, movimento, emoção",
+            "david": "🎨 Arte: David Michelangelo, mármore, Renascimento, perfeição humana",
+            "pensador": "🎨 Arte: Pensador Rodin, bronze, reflexão, escultura moderna",
+            "impressionismo": "🎨 Arte: Impressionismo Monet, luz, cor, ar livre, modernidade",
+            "cubismo": "🎨 Arte: Cubismo Picasso/Braque, geometria, perspectiva múltipla",
+            "surrealismo": "🎨 Arte: Surrealismo Dalí, inconsciente, sonhos, automatismo",
+            "barroco": "🎨 Arte: Barroco drama, movimento, Caravaggio, contra-reforma",
+            "romantismo": "🎨 Arte: Romantismo emoção, natureza, individualismo, século XIX",
+            
+            # MÚSICA ESPECÍFICA
+            "beethoven": "🎵 Música: Beethoven 9ª Sinfonia, surdo, génio, classicismo/romantismo",
+            "mozart": "🎵 Música: Mozart prodígio, 600 obras, Requiem, classicismo vienense",
+            "bach": "🎵 Música: Bach contraponto, fuga, barroco, matemática musical",
+            "beatles": "🎵 Música: Beatles Liverpool, John/Paul/George/Ringo, revolução pop",
+            "elvis": "🎵 Música: Elvis Presley rei rock, Graceland, revolução cultural",
+            "michael jackson": "🎵 Música: Michael Jackson rei pop, Thriller, moonwalk, Neverland",
+            "queen": "🎵 Música: Queen Freddie Mercury, Bohemian Rhapsody, Live Aid",
+            "rolling stones": "🎵 Música: Rolling Stones Mick Jagger, rock rebelde, longevidade",
+            "bob dylan": "🎵 Música: Bob Dylan folk/rock, Nobel Literatura, protesto social",
+            "jazz": "🎵 Música: Jazz improvisação, blues, swing, Miles Davis, Coltrane",
+            
+            # LITERATURA ESPECÍFICA
+            "shakespeare": "📚 Literatura: Shakespeare Hamlet, Romeo Julieta, maior dramaturgo inglês",
+            "camoes": "📚 Literatura: Camões Lusíadas, épico português, amor lírico",
+            "pessoa": "📚 Literatura: Fernando Pessoa heterónimos, Álvaro Campos, modernismo",
+            "cervantes": "📚 Literatura: Cervantes Dom Quixote, primeiro romance moderno",
+            "dante": "📚 Literatura: Dante Divina Comédia, Inferno, italiano medieval",
+            "homer": "📚 Literatura: Homero Ilíada/Odisseia, épicos gregos, guerra Tróia",
+            "tolstoi": "📚 Literatura: Tolstói Guerra e Paz, realismo russo, moral",
+            "dostoievski": "📚 Literatura: Dostoiévski Crime Castigo, psicologia, existencial",
+            "joyce": "📚 Literatura: Joyce Ulisses, fluxo consciência, modernismo",
+            "kafka": "📚 Literatura: Kafka Metamorfose, absurdo, burocracia, alienação",
+            
+            # ECONOMIA E NEGÓCIOS
+            "capitalismo": "💰 Economia: Capitalismo propriedade privada, mercado livre, lucro, Adam Smith",
+            "socialismo": "💰 Economia: Socialismo propriedade coletiva, igualdade, Marx, estado",
+            "inflacao": "💰 Economia: Inflação aumento preços, poder compra, banco central",
+            "recessao": "💰 Economia: Recessão contração económica, desemprego, PIB negativo",
+            "bolsa": "💰 Economia: Bolsa valores ações, investimento, Wall Street, volatilidade",
+            "bitcoin": "💰 Economia: Bitcoin criptomoeda, blockchain, Satoshi, descentralizada",
+            "ethereum": "💰 Economia: Ethereum contratos inteligentes, Vitalik, DeFi, NFT",
+            "startup": "💰 Economia: Startup empresa inovadora, crescimento rápido, venture capital",
+            "unicornio": "💰 Economia: Unicórnio startup valorizada +1 bilhão, rara, tecnologia",
+            "ipo": "💰 Economia: IPO oferta pública inicial, bolsa, capital, crescimento",
             
             # PLANETAS ESPECÍFICOS
             "mercurio planeta": "🪐 Astronomia: Mercúrio planeta mais próximo Sol, sem atmosfera, extremos temperatura",
