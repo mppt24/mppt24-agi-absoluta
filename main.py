@@ -1,5 +1,9 @@
 import sqlite3
 import re
+import sqlite3
+import random
+import string
+import math
 from datetime import datetime
 from flask import Flask, request, jsonify, render_template_string
 from flask_cors import CORS
@@ -7,6 +11,182 @@ import requests
 import hashlib
 import time
 import threading
+import json
+import base64
+
+# Funcionalidades extras seguras
+class ExtraFeatures:
+    """Funcionalidades extras que não interferem com o conhecimento existente"""
+    
+    @staticmethod
+    def gerar_qr_code_texto(texto):
+        """Gera representação ASCII simples de QR code"""
+        try:
+            # Simulação simples de QR code em ASCII
+            hash_obj = hashlib.md5(texto.encode())
+            hash_hex = hash_obj.hexdigest()
+            
+            qr_pattern = []
+            for i in range(0, len(hash_hex), 4):
+                chunk = hash_hex[i:i+4]
+                row = ""
+                for char in chunk:
+                    if int(char, 16) % 2 == 0:
+                    row += "██"
+                else:
+                    row += "  "
+                qr_pattern.append(row)
+            
+            qr_ascii = "\n".join(qr_pattern)
+            return f"📱 QR Code ASCII para '{texto}':\n```\n{qr_ascii}\n```"
+        except Exception as e:
+            return f"❌ Erro ao gerar QR code: {str(e)}"
+    
+    @staticmethod
+    def codificar_base64(texto):
+        """Codifica texto em Base64"""
+        try:
+            encoded = base64.b64encode(texto.encode('utf-8')).decode('utf-8')
+            return f"🔐 Base64: {encoded}"
+        except Exception as e:
+            return f"❌ Erro ao codificar: {str(e)}"
+    
+    @staticmethod
+    def decodificar_base64(texto_codificado):
+        """Decodifica texto de Base64"""
+        try:
+            decoded = base64.b64decode(texto_codificado).decode('utf-8')
+            return f"🔓 Decodificado: {decoded}"
+        except Exception as e:
+            return f"❌ Erro ao decodificar: {str(e)}"
+    
+    @staticmethod
+    def gerar_hash(texto, algoritmo="sha256"):
+        """Gera hash do texto com algoritmo especificado"""
+        try:
+            if algoritmo.lower() == "md5":
+                hash_obj = hashlib.md5(texto.encode())
+            elif algoritmo.lower() == "sha1":
+                hash_obj = hashlib.sha1(texto.encode())
+            elif algoritmo.lower() == "sha256":
+                hash_obj = hashlib.sha256(texto.encode())
+            else:
+                return f"❌ Algoritmo '{algoritmo}' não suportado. Use: md5, sha1, sha256"
+            
+            return f"🔐 Hash {algoritmo.upper()}: {hash_obj.hexdigest()}"
+        except Exception as e:
+            return f"❌ Erro ao gerar hash: {str(e)}"
+    
+    @staticmethod
+    def contador_palavras(texto):
+        """Conta palavras, caracteres e linhas do texto"""
+        try:
+            palavras = len(texto.split())
+            caracteres = len(texto)
+            caracteres_sem_espacos = len(texto.replace(' ', ''))
+            linhas = len(texto.split('\n'))
+            
+            return f"📊 Estatísticas do texto:\n• Palavras: {palavras}\n• Caracteres: {caracteres}\n• Caracteres (sem espaços): {caracteres_sem_espacos}\n• Linhas: {linhas}"
+        except Exception as e:
+            return f"❌ Erro ao contar: {str(e)}"
+    
+    @staticmethod
+    def gerar_lorem_ipsum(num_palavras=50):
+        """Gera texto Lorem Ipsum"""
+        lorem_words = [
+            "lorem", "ipsum", "dolor", "sit", "amet", "consectetur", "adipiscing", "elit",
+            "sed", "do", "eiusmod", "tempor", "incididunt", "ut", "labore", "et", "dolore",
+            "magna", "aliqua", "enim", "ad", "minim", "veniam", "quis", "nostrud",
+            "exercitation", "ullamco", "laboris", "nisi", "aliquip", "ex", "ea", "commodo",
+            "consequat", "duis", "aute", "irure", "in", "reprehenderit", "voluptate",
+            "velit", "esse", "cillum", "fugiat", "nulla", "pariatur", "excepteur", "sint",
+            "occaecat", "cupidatat", "non", "proident", "sunt", "culpa", "qui", "officia",
+            "deserunt", "mollit", "anim", "id", "est", "laborum"
+        ]
+        
+        try:
+            num_palavras = min(max(int(num_palavras), 1), 200)  # Limite entre 1 e 200
+            texto = []
+            
+            for i in range(num_palavras):
+                palavra = random.choice(lorem_words)
+                if i == 0:
+                    palavra = palavra.capitalize()
+                texto.append(palavra)
+                
+                # Adicionar pontuação ocasionalmente
+                if (i + 1) % random.randint(8, 15) == 0 and i < num_palavras - 1:
+                    texto[-1] += random.choice(['.', ',', ';'])
+                    if texto[-1].endswith('.'):
+                        # Próxima palavra com maiúscula
+                        continue
+            
+            # Garantir que termina com ponto
+            if not texto[-1].endswith(('.', '!', '?')):
+                texto[-1] += '.'
+            
+            return f"📝 Lorem Ipsum ({num_palavras} palavras):\n{' '.join(texto)}"
+        except Exception as e:
+            return f"❌ Erro ao gerar Lorem Ipsum: {str(e)}"
+    
+    @staticmethod
+    def validar_email(email):
+        """Valida formato de email"""
+        try:
+            pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+            if re.match(pattern, email):
+                return f"✅ Email '{email}' é válido"
+            else:
+                return f"❌ Email '{email}' é inválido"
+        except Exception as e:
+            return f"❌ Erro ao validar email: {str(e)}"
+    
+    @staticmethod
+    def gerar_cores_hex():
+        """Gera cores hexadecimais aleatórias"""
+        try:
+            cores = []
+            for i in range(5):
+                cor = "#{:06x}".format(random.randint(0, 0xFFFFFF))
+                cores.append(cor)
+            
+            return f"🎨 Cores hexadecimais aleatórias:\n" + "\n".join([f"• {cor}" for cor in cores])
+        except Exception as e:
+            return f"❌ Erro ao gerar cores: {str(e)}"
+    
+    @staticmethod
+    def calcular_imc(peso, altura):
+        """Calcula Índice de Massa Corporal"""
+        try:
+            peso = float(peso)
+            altura = float(altura)
+            
+            if altura <= 0 or peso <= 0:
+                return "❌ Peso e altura devem ser valores positivos"
+            
+            # Se altura parece estar em cm, converter para metros
+            if altura > 3:
+                altura = altura / 100
+            
+            imc = peso / (altura ** 2)
+            
+            if imc < 18.5:
+                categoria = "Abaixo do peso"
+            elif imc < 25:
+                categoria = "Peso normal"
+            elif imc < 30:
+                categoria = "Sobrepeso"
+            else:
+                categoria = "Obesidade"
+            
+            return f"⚖️ IMC: {imc:.1f} - {categoria}\n(Peso: {peso}kg, Altura: {altura:.2f}m)"
+        except ValueError:
+            return "❌ Peso e altura devem ser números válidos"
+        except Exception as e:
+            return f"❌ Erro ao calcular IMC: {str(e)}"
+
+# Instância global das funcionalidades extras
+extra_features = ExtraFeatures()
 
 # Classe para comunicação REAL com outras IAs e computação quântica
 class RealSuperIACommunicator:
@@ -81,7 +261,65 @@ class MPPT24_Absoluta:
         """SUPER-IA ABSOLUTA - CONHECIMENTO SOBRE TUDO QUE EXISTE NO UNIVERSO"""
         mensagem = mensagem.lower().strip()
         
-        # CONVERSAÇÃO NATURAL
+        # FUNCIONALIDADES EXTRAS SEGURAS (verificar primeiro para não interferir)
+        if "qr code" in mensagem or "qr" in mensagem:
+            texto = mensagem.replace("qr code", "").replace("qr", "").strip()
+            if texto:
+                return extra_features.gerar_qr_code_texto(texto)
+        
+        if mensagem.startswith("codificar "):
+            texto = mensagem[10:]  # Remove "codificar "
+            return extra_features.codificar_base64(texto)
+        
+        if mensagem.startswith("decodificar "):
+            texto = mensagem[12:]  # Remove "decodificar "
+            return extra_features.decodificar_base64(texto)
+        
+        if mensagem.startswith("hash "):
+            partes = mensagem[5:].split()
+            if len(partes) >= 2:
+                algoritmo = partes[0]
+                texto = " ".join(partes[1:])
+                return extra_features.gerar_hash(texto, algoritmo)
+            else:
+                texto = " ".join(partes)
+                return extra_features.gerar_hash(texto)
+        
+        if "contar palavras" in mensagem or "estatisticas texto" in mensagem:
+            # Extrair texto após o comando
+            texto = mensagem.replace("contar palavras", "").replace("estatisticas texto", "").strip()
+            if texto:
+                return extra_features.contador_palavras(texto)
+            else:
+                return "📊 Use: 'contar palavras [seu texto aqui]'"
+        
+        if "lorem ipsum" in mensagem:
+            # Extrair número de palavras se especificado
+            match = re.search(r'(\d+)', mensagem)
+            num_palavras = int(match.group(1)) if match else 50
+            return extra_features.gerar_lorem_ipsum(num_palavras)
+        
+        if "validar email" in mensagem:
+            email = mensagem.replace("validar email", "").strip()
+            if email:
+                return extra_features.validar_email(email)
+            else:
+                return "📧 Use: 'validar email exemplo@email.com'"
+        
+        if "gerar cores" in mensagem or "cores hex" in mensagem:
+            return extra_features.gerar_cores_hex()
+        
+        if "calcular imc" in mensagem or "imc" in mensagem:
+            # Extrair peso e altura
+            numeros = re.findall(r'\d+(?:\.\d+)?', mensagem)
+            if len(numeros) >= 2:
+                peso = numeros[0]
+                altura = numeros[1]
+                return extra_features.calcular_imc(peso, altura)
+            else:
+                return "⚖️ Use: 'calcular imc [peso] [altura]' (ex: calcular imc 70 1.75)"
+        
+        # CONVERSAÇÃO NATURAL (mantida intacta)
         respostas_simples = {
             "ola": "Olá! Como estás?", "oi": "Oi! Tudo bem?", "olá": "Olá! Como estás?",
             "tudo bem": "Tudo bem! E tu?", "como estás": "Bem, obrigado! E tu?",
