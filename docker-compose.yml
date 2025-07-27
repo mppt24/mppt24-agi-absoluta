@@ -1,0 +1,132 @@
+version: '3.8'
+
+services:
+  # 🧠 mppt24 AGI ABSOLUTA Main Application
+  mppt24-agi:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mppt24-agi-absoluta
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+    volumes:
+      - .:/app
+      - /app/__pycache__
+    restart: unless-stopped
+    networks:
+      - mppt24-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # 📊 Redis for Caching (Future Enhancement)
+  redis:
+    image: redis:7-alpine
+    container_name: mppt24-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    networks:
+      - mppt24-network
+    command: redis-server --appendonly yes
+
+  # 📈 Prometheus for Metrics (Future Enhancement)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: mppt24-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    restart: unless-stopped
+    networks:
+      - mppt24-network
+
+  # 📊 Grafana for Dashboards (Future Enhancement)
+  grafana:
+    image: grafana/grafana:latest
+    container_name: mppt24-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=mppt24admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources
+    restart: unless-stopped
+    networks:
+      - mppt24-network
+
+  # 🔍 Elasticsearch for Logging (Future Enhancement)
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    container_name: mppt24-elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    restart: unless-stopped
+    networks:
+      - mppt24-network
+
+  # 📋 Kibana for Log Visualization (Future Enhancement)
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.11.0
+    container_name: mppt24-kibana
+    ports:
+      - "5601:5601"
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    depends_on:
+      - elasticsearch
+    restart: unless-stopped
+    networks:
+      - mppt24-network
+
+  # 🔄 Nginx Reverse Proxy (Production)
+  nginx:
+    image: nginx:alpine
+    container_name: mppt24-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/ssl:/etc/nginx/ssl
+    depends_on:
+      - mppt24-agi
+    restart: unless-stopped
+    networks:
+      - mppt24-network
+
+networks:
+  mppt24-network:
+    driver: bridge
+
+volumes:
+  redis_data:
+  prometheus_data:
+  grafana_data:
+  elasticsearch_data:
+

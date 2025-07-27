@@ -1,0 +1,239 @@
+name: ✨ Feature Request
+description: Sugerir uma nova funcionalidade para a mppt24 AGI ABSOLUTA
+title: "[FEATURE] "
+labels: ["enhancement", "needs-discussion"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Obrigado por sugerir uma nova funcionalidade! ✨
+        
+        As tuas ideias ajudam a tornar a mppt24 AGI ABSOLUTA ainda melhor.
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: ✅ Checklist
+      description: Confirma que verificaste os seguintes pontos
+      options:
+        - label: Procurei por pedidos similares e não encontrei duplicatas
+          required: true
+        - label: Li o roadmap e esta funcionalidade não está planeada
+          required: true
+        - label: Esta funcionalidade alinha-se com os objetivos do projeto
+          required: true
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: 🏷️ Categoria
+      description: Que tipo de funcionalidade estás a sugerir?
+      options:
+        - "🧠 Conhecimento - Nova área de conhecimento"
+        - "💬 Conversação - Melhorias na interação"
+        - "🔌 API - Novos endpoints ou melhorias"
+        - "🎨 Interface - Melhorias visuais ou UX"
+        - "⚡ Performance - Otimizações de velocidade"
+        - "🔒 Segurança - Melhorias de segurança"
+        - "🌐 Integração - Conectar com serviços externos"
+        - "📱 Mobile - Funcionalidades específicas para mobile"
+        - "🤖 IA - Capacidades de inteligência artificial"
+        - "📊 Analytics - Métricas e relatórios"
+        - "🔧 DevOps - Ferramentas de desenvolvimento"
+        - "📚 Documentação - Melhorias na documentação"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: 🚨 Prioridade
+      description: Qual é a importância desta funcionalidade?
+      options:
+        - "🔴 Crítica - Essencial para o funcionamento"
+        - "🟠 Alta - Muito importante para utilizadores"
+        - "🟡 Média - Útil mas não urgente"
+        - "🟢 Baixa - Nice to have"
+    validations:
+      required: true
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: 📝 Resumo da Funcionalidade
+      description: Descreve brevemente a funcionalidade que queres
+      placeholder: |
+        Exemplo: Adicionar suporte para cálculos matemáticos avançados, incluindo trigonometria, logaritmos e resolução de equações.
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: 🎯 Problema que Resolve
+      description: Que problema ou necessidade esta funcionalidade resolve?
+      placeholder: |
+        Exemplo: Atualmente, a AGI não consegue resolver problemas matemáticos complexos, limitando a sua utilidade para estudantes e profissionais de STEM.
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: 💡 Solução Proposta
+      description: Descreve detalhadamente como imaginas que esta funcionalidade funcionaria
+      placeholder: |
+        Exemplo:
+        1. Adicionar um módulo de matemática avançada
+        2. Reconhecer expressões matemáticas na entrada do utilizador
+        3. Processar e resolver usando bibliotecas como SymPy
+        4. Retornar resultado formatado com passos da resolução
+    validations:
+      required: true
+
+  - type: textarea
+    id: examples
+    attributes:
+      label: 📋 Exemplos de Uso
+      description: Fornece exemplos concretos de como esta funcionalidade seria usada
+      placeholder: |
+        Exemplo:
+        
+        Entrada: "resolver x^2 + 5x + 6 = 0"
+        Saída: "🧮 Matemática: x² + 5x + 6 = 0 → x = -2 ou x = -3 (fatorização: (x+2)(x+3)=0)"
+        
+        Entrada: "calcular sin(π/4)"
+        Saída: "🧮 Matemática: sin(π/4) = √2/2 ≈ 0.707"
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: 🔄 Alternativas Consideradas
+      description: Que outras soluções consideraste? Por que esta é a melhor?
+      placeholder: |
+        Exemplo:
+        - Integração com Wolfram Alpha API (mas requer internet e custos)
+        - Calculadora básica (mas limitada para casos complexos)
+        - Esta solução oferece o melhor equilíbrio entre funcionalidade e simplicidade
+
+  - type: dropdown
+    id: complexity
+    attributes:
+      label: 🔧 Complexidade Estimada
+      description: Qual achas que é a complexidade de implementação?
+      options:
+        - "🟢 Simples - Poucas horas de trabalho"
+        - "🟡 Moderada - Alguns dias de trabalho"
+        - "🟠 Complexa - Algumas semanas de trabalho"
+        - "🔴 Muito Complexa - Meses de trabalho"
+        - "❓ Não sei estimar"
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: impact
+    attributes:
+      label: 📊 Impacto Esperado
+      description: Que impacto esperas que esta funcionalidade tenha?
+      options:
+        - label: Melhorará significativamente a experiência do utilizador
+        - label: Atrairá novos utilizadores
+        - label: Resolverá problemas reportados frequentemente
+        - label: Alinha-se com o roadmap do projeto
+        - label: Diferenciará a mppt24 de outras soluções
+        - label: Terá impacto educacional positivo
+        - label: Será útil para casos de uso profissionais
+
+  - type: textarea
+    id: technical
+    attributes:
+      label: ⚙️ Considerações Técnicas
+      description: Tens alguma ideia sobre a implementação técnica?
+      placeholder: |
+        Exemplo:
+        - Usar biblioteca SymPy para cálculos simbólicos
+        - Adicionar parser para expressões matemáticas
+        - Integrar com sistema de conhecimento existente
+        - Considerar cache para cálculos complexos
+
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: 📦 Dependências
+      description: Esta funcionalidade depende de outras funcionalidades ou bibliotecas?
+      placeholder: |
+        Exemplo:
+        - Requer instalação de SymPy
+        - Pode beneficiar de sistema de plugins futuro
+        - Depende de melhorias no parser de entrada
+
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: 🤝 Contribuição
+      description: Estás disposto a ajudar com esta funcionalidade?
+      options:
+        - label: Posso ajudar com o design da funcionalidade
+        - label: Posso contribuir com código
+        - label: Posso ajudar com testes
+        - label: Posso ajudar com documentação
+        - label: Posso fornecer feedback durante o desenvolvimento
+
+  - type: textarea
+    id: mockups
+    attributes:
+      label: 🎨 Mockups/Wireframes
+      description: Tens algum mockup, wireframe ou design visual para esta funcionalidade?
+      placeholder: |
+        Podes arrastar e largar imagens aqui ou descrever visualmente como imaginas a interface
+
+  - type: textarea
+    id: research
+    attributes:
+      label: 🔍 Pesquisa/Referências
+      description: Fizeste alguma pesquisa sobre esta funcionalidade? Tens referências úteis?
+      placeholder: |
+        Exemplo:
+        - Wolfram Alpha como referência de funcionalidade
+        - SymPy documentation: https://docs.sympy.org/
+        - Paper sobre parsing de expressões matemáticas
+        - Exemplos de outras implementações
+
+  - type: dropdown
+    id: timeline
+    attributes:
+      label: ⏰ Timeline Desejado
+      description: Quando gostarias de ver esta funcionalidade implementada?
+      options:
+        - "🚀 ASAP - É urgente"
+        - "📅 Próximo mês - Seria muito útil em breve"
+        - "🗓️ Próximos 3 meses - Não há pressa"
+        - "📆 Próximos 6 meses - Pode esperar"
+        - "🔮 Futuro - Quando for possível"
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: ℹ️ Informação Adicional
+      description: Qualquer outra informação que possa ser útil
+      placeholder: |
+        - Links para recursos úteis
+        - Casos de uso específicos
+        - Feedback de outros utilizadores
+        - Considerações especiais
+
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        
+        **Obrigado pela tua sugestão!** 🙏
+        
+        A nossa equipa irá analisar o teu pedido e discutir a viabilidade e prioridade.
+        
+        Podes acompanhar o progresso através das notificações do GitHub. Se a funcionalidade for aprovada, será adicionada ao roadmap do projeto.
+

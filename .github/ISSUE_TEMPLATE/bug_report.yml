@@ -1,0 +1,190 @@
+name: 🐛 Bug Report
+description: Reportar um bug para ajudar a melhorar a mppt24 AGI ABSOLUTA
+title: "[BUG] "
+labels: ["bug", "needs-triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Obrigado por reportar este bug! 🐛
+        
+        Por favor, preenche as informações abaixo para nos ajudar a resolver o problema rapidamente.
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: ✅ Checklist
+      description: Confirma que verificaste os seguintes pontos antes de reportar
+      options:
+        - label: Procurei por issues similares e não encontrei duplicatas
+          required: true
+        - label: Li a documentação e o problema persiste
+          required: true
+        - label: Testei com a versão mais recente
+          required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: 📝 Descrição do Bug
+      description: Descreve claramente o que está a acontecer
+      placeholder: |
+        Exemplo: Quando pergunto "hidrogenio", a AGI responde com informação sobre oxigénio em vez de hidrogénio.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: 🔄 Passos para Reproduzir
+      description: Lista os passos exatos para reproduzir o bug
+      placeholder: |
+        1. Abrir a aplicação
+        2. Escrever "hidrogenio" na caixa de chat
+        3. Clicar em "Enviar"
+        4. Ver resposta incorreta
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: ✅ Comportamento Esperado
+      description: Descreve o que deveria acontecer
+      placeholder: |
+        Deveria retornar: "⚗️ Química: Hidrogénio (H) elemento 1, mais simples, 1 protão, combustível futuro"
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: ❌ Comportamento Atual
+      description: Descreve o que realmente acontece
+      placeholder: |
+        Retorna: "⚗️ Química: Oxigénio (O) elemento 8, essencial vida, respiração"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: 🚨 Severidade
+      description: Qual é o impacto deste bug?
+      options:
+        - "🔴 Crítico - Aplicação não funciona"
+        - "🟠 Alto - Funcionalidade principal afetada"
+        - "🟡 Médio - Funcionalidade secundária afetada"
+        - "🟢 Baixo - Problema cosmético ou menor"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: 🧩 Componente Afetado
+      description: Que parte da aplicação está afetada?
+      options:
+        - "🧠 Base de Conhecimento"
+        - "💬 Interface de Chat"
+        - "🔌 API REST"
+        - "🎨 Interface Visual"
+        - "⚙️ Configuração/Deploy"
+        - "📚 Documentação"
+        - "🧪 Testes"
+        - "🔄 Outro"
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: 📦 Versão
+      description: Que versão da mppt24 AGI ABSOLUTA estás a usar?
+      placeholder: "v1.0.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: browser
+    attributes:
+      label: 🌐 Browser
+      description: Que browser estás a usar? (se aplicável)
+      options:
+        - "Chrome"
+        - "Firefox"
+        - "Safari"
+        - "Edge"
+        - "Opera"
+        - "Outro"
+        - "N/A - Não é problema de browser"
+
+  - type: input
+    id: os
+    attributes:
+      label: 💻 Sistema Operativo
+      description: Que sistema operativo estás a usar?
+      placeholder: "Windows 11, macOS 14, Ubuntu 22.04, etc."
+    validations:
+      required: true
+
+  - type: input
+    id: python
+    attributes:
+      label: 🐍 Versão Python
+      description: Que versão do Python estás a usar? (se aplicável)
+      placeholder: "3.11.0"
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: 📋 Logs/Mensagens de Erro
+      description: Cola aqui quaisquer logs ou mensagens de erro relevantes
+      placeholder: |
+        Traceback (most recent call last):
+          File "main.py", line 123, in processar_mensagem
+            ...
+      render: shell
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: 📸 Screenshots
+      description: Se aplicável, adiciona screenshots para ajudar a explicar o problema
+      placeholder: |
+        Podes arrastar e largar imagens aqui ou usar Ctrl+V para colar
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: ℹ️ Informação Adicional
+      description: Qualquer outra informação que possa ser útil
+      placeholder: |
+        - Acontece sempre ou só às vezes?
+        - Começou depois de alguma mudança específica?
+        - Funciona noutros ambientes?
+        - Outras observações relevantes
+
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: 🤝 Contribuição
+      description: Estás disposto a ajudar a resolver este bug?
+      options:
+        - label: Estou disposto a trabalhar numa correção para este bug
+        - label: Posso fornecer mais informações se necessário
+        - label: Posso testar a correção quando estiver disponível
+
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        
+        **Obrigado por reportar este bug!** 🙏
+        
+        A nossa equipa irá analisar o teu report e responder o mais rapidamente possível.
+        
+        Podes acompanhar o progresso através das notificações do GitHub ou visitando esta issue regularmente.
+
