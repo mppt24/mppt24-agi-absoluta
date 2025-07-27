@@ -94,7 +94,127 @@ class MPPT24_Absoluta:
             self.salvar_conversa(mensagem, resposta)
             return resposta
         
-        # MATEMÁTICA
+        # FUNCIONALIDADES AVANÇADAS
+        
+        # CALCULADORA CIENTÍFICA AVANÇADA
+        if mensagem.startswith("calcular ") or mensagem.startswith("calcula "):
+            import math
+            import re
+            
+            expressao = mensagem.replace("calcular ", "").replace("calcula ", "")
+            
+            try:
+                # Substituições para tornar expressões mais naturais
+                expressao = expressao.replace("x", "*")
+                expressao = expressao.replace("÷", "/")
+                expressao = expressao.replace("×", "*")
+                expressao = expressao.replace("^", "**")
+                expressao = expressao.replace("pi", str(math.pi))
+                expressao = expressao.replace("e", str(math.e))
+                
+                # Funções matemáticas
+                expressao = re.sub(r'sqrt\(([^)]+)\)', r'math.sqrt(\1)', expressao)
+                expressao = re.sub(r'sin\(([^)]+)\)', r'math.sin(\1)', expressao)
+                expressao = re.sub(r'cos\(([^)]+)\)', r'math.cos(\1)', expressao)
+                expressao = re.sub(r'tan\(([^)]+)\)', r'math.tan(\1)', expressao)
+                expressao = re.sub(r'log\(([^)]+)\)', r'math.log(\1)', expressao)
+                expressao = re.sub(r'ln\(([^)]+)\)', r'math.log(\1)', expressao)
+                
+                resultado = eval(expressao)
+                resposta = f"🧮 Resultado: {resultado}"
+                self.salvar_conversa(mensagem, resposta)
+                return resposta
+            except:
+                resposta = "🧮 Erro no cálculo. Tenta algo como: calcular 2+2, sqrt(16), sin(pi/2)"
+                self.salvar_conversa(mensagem, resposta)
+                return resposta
+        
+        # TRADUTOR MULTI-IDIOMAS
+        if mensagem.startswith("traduzir ") or mensagem.startswith("traduz "):
+            texto_traduzir = mensagem.replace("traduzir ", "").replace("traduz ", "")
+            
+            # Traduções básicas português-inglês-espanhol
+            traducoes = {
+                "olá": "🌐 Tradução: Hello (EN), Hola (ES), Bonjour (FR), Ciao (IT)",
+                "obrigado": "🌐 Tradução: Thank you (EN), Gracias (ES), Merci (FR), Grazie (IT)",
+                "amor": "🌐 Tradução: Love (EN), Amor (ES), Amour (FR), Amore (IT)",
+                "água": "🌐 Tradução: Water (EN), Agua (ES), Eau (FR), Acqua (IT)",
+                "casa": "🌐 Tradução: House (EN), Casa (ES), Maison (FR), Casa (IT)",
+                "carro": "🌐 Tradução: Car (EN), Coche (ES), Voiture (FR), Auto (IT)",
+                "comida": "🌐 Tradução: Food (EN), Comida (ES), Nourriture (FR), Cibo (IT)",
+                "família": "🌐 Tradução: Family (EN), Familia (ES), Famille (FR), Famiglia (IT)",
+                "trabalho": "🌐 Tradução: Work (EN), Trabajo (ES), Travail (FR), Lavoro (IT)",
+                "escola": "🌐 Tradução: School (EN), Escuela (ES), École (FR), Scuola (IT)",
+            }
+            
+            if texto_traduzir in traducoes:
+                resposta = traducoes[texto_traduzir]
+            else:
+                resposta = "🌐 Tradução: Palavra não encontrada. Tenta: olá, obrigado, amor, água, casa"
+            
+            self.salvar_conversa(mensagem, resposta)
+            return resposta
+        
+        # CONVERSOR DE UNIDADES
+        if mensagem.startswith("converter ") or mensagem.startswith("converte "):
+            conversao = mensagem.replace("converter ", "").replace("converte ", "")
+            
+            conversores = {
+                "1 metro em cm": "🔄 Conversão: 1 metro = 100 centímetros",
+                "1 km em metros": "🔄 Conversão: 1 quilómetro = 1000 metros",
+                "1 kg em gramas": "🔄 Conversão: 1 quilograma = 1000 gramas",
+                "1 litro em ml": "🔄 Conversão: 1 litro = 1000 mililitros",
+                "celsius fahrenheit": "🔄 Conversão: °C para °F = (°C × 9/5) + 32",
+                "fahrenheit celsius": "🔄 Conversão: °F para °C = (°F - 32) × 5/9",
+                "1 hora em minutos": "🔄 Conversão: 1 hora = 60 minutos",
+                "1 dia em horas": "🔄 Conversão: 1 dia = 24 horas",
+                "1 ano em dias": "🔄 Conversão: 1 ano = 365 dias",
+                "1 euro em dolares": "🔄 Conversão: ~1 EUR = 1.10 USD (varia diariamente)",
+            }
+            
+            resposta_encontrada = None
+            for chave, valor in conversores.items():
+                if chave in conversao:
+                    resposta_encontrada = valor
+                    break
+            
+            if resposta_encontrada:
+                resposta = resposta_encontrada
+            else:
+                resposta = "🔄 Conversão: Não encontrada. Tenta: metro em cm, kg em gramas, celsius fahrenheit"
+            
+            self.salvar_conversa(mensagem, resposta)
+            return resposta
+        
+        # GERADOR DE SENHAS SEGURAS
+        if "gerar senha" in mensagem or "criar senha" in mensagem:
+            import random
+            import string
+            
+            caracteres = string.ascii_letters + string.digits + "!@#$%&*"
+            senha = ''.join(random.choice(caracteres) for _ in range(12))
+            resposta = f"🔐 Senha segura gerada: {senha}"
+            self.salvar_conversa(mensagem, resposta)
+            return resposta
+        
+        # INFORMAÇÕES DO SISTEMA
+        if "que horas" in mensagem or "hora atual" in mensagem:
+            from datetime import datetime
+            agora = datetime.now()
+            resposta = f"🕐 Hora atual: {agora.strftime('%H:%M:%S de %d/%m/%Y')}"
+            self.salvar_conversa(mensagem, resposta)
+            return resposta
+        
+        if "data hoje" in mensagem or "que dia" in mensagem:
+            from datetime import datetime
+            hoje = datetime.now()
+            dias_semana = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado", "Domingo"]
+            dia_semana = dias_semana[hoje.weekday()]
+            resposta = f"📅 Hoje é {dia_semana}, {hoje.strftime('%d/%m/%Y')}"
+            self.salvar_conversa(mensagem, resposta)
+            return resposta
+        
+        # MATEMÁTICA AVANÇADA
         if "derivada" in mensagem and ("x²+5x+3" in mensagem or "x2+5x+3" in mensagem):
             resposta = "🧮 Matemática: A derivada de x²+5x+3 é 2x+5"
             self.salvar_conversa(mensagem, resposta)
