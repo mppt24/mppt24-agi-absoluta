@@ -1,5 +1,7 @@
 # MPPT24 AGI Absoluta
 
+[Guia de leitura, infográfico e cuidados](GUIA.md)
+
 Protótipo de chat local do [MPPT24OS](https://github.com/mppt24/MPPT24OS). Tem uma calculadora, um conversor de unidades e respostas predefinidas por tema. Funciona sem chaves de API.
 
 [![MPPT24 AGI Absoluta. Protótipo de chat local com calculadora, conversões e respostas por temas.](docs/infografico.png)](docs/infografico.png)
