@@ -42,6 +42,12 @@ O serviço foi preparado para utilização local e não tem autenticação. O Do
 
 Algumas mensagens e respostas ficam guardadas numa base SQLite local. O volume Docker conserva esse histórico quando paras os contentores. Evita introduzir dados privados no chat. As respostas por tema vêm de um conjunto local limitado e as integrações externas continuam em avaliação.
 
+## Janela de acessibilidade
+
+Na aplicação, abre **Acessibilidade** no canto inferior direito. Podes mover a janela com o dedo ou rato. Com o teclado, põe o foco em **Mover** e usa as setas. **Repor posição** volta ao canto e **Escape** fecha a janela.
+
+O painel mostra a última resposta em texto. **Ouvir resposta** usa uma voz local em português de Portugal, quando estiver disponível no dispositivo. O vídeo educativo com intérprete de Língua Gestual Portuguesa carrega do YouTube só quando o pedes. Podes consultar gestos por palavra no dicionário ligado no painel. A tradução automática das respostas para LGP está por implementar.
+
 ## Infográfico
 
 [![MPPT24 AGI Absoluta. Protótipo de chat local com calculadora, conversões e respostas por temas.](docs/infografico.png)](docs/infografico.png)

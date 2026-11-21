@@ -25,10 +25,37 @@
     .entry { display: flex; flex-wrap: wrap; gap: .5rem; }
     input { flex: 1 1 12rem; min-width: 0; border: 1px solid #657c87; background: #11171e; color: #ebf2f5; padding: .75rem; border-radius: .6rem; }
     button[type="submit"] { background: #9decce; color: #11241c; font-weight: 700; }
-    #respostas:empty { display: none; }
+    #respostas:empty { margin: 0; }
     #respostas { padding: 0; list-style: none; }
     #respostas li { margin-bottom: .5rem; border-inline-start: 2px solid #6dbca0; padding: .6rem .8rem; background: #10171d; white-space: pre-wrap; overflow-wrap: anywhere; }
     #estado { min-height: 1.5em; }
+
+    body { padding-bottom: 5rem; }
+    a { color: #a7e9ff; }
+    .access-tools {
+      position: fixed; z-index: 2;
+      right: max(.75rem, env(safe-area-inset-right));
+      bottom: max(.75rem, env(safe-area-inset-bottom));
+      max-width: calc(100vw - 1.5rem);
+    }
+    .access-tools button { min-height: 2.75rem; }
+    #access-toggle { display: block; margin-inline-start: auto; font-weight: 700; box-shadow: 0 3px 16px #0008; }
+    #access-window {
+      width: min(24rem, calc(100vw - 1.5rem));
+      max-height: calc(100dvh - 5rem);
+      overflow: auto; overscroll-behavior: contain;
+      margin-bottom: .5rem; padding: .85rem;
+      border: 1px solid #6d948b; border-radius: .8rem;
+      background: #161d25; box-shadow: 0 12px 28px #000a;
+    }
+    #access-window h2 { margin: 0; }
+    #access-window h3 { font-size: 1rem; margin-bottom: .4rem; }
+    #access-window p { margin: .5rem 0; }
+    .access-actions { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .65rem; }
+    #access-move { touch-action: none; cursor: grab; }
+    #access-move:active { cursor: grabbing; }
+    #access-answer { max-height: 8rem; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; }
+    #lgp-player { display: block; width: 100%; aspect-ratio: 16 / 9; margin: .6rem 0; border: 0; }
   </style>
 </head>
 <body>
@@ -55,12 +82,168 @@
       <p class="hint" id="estado" role="status"></p>
     </section>
   </main>
+
+  <div class="access-tools" id="access-tools">
+    <div id="access-window" role="region" aria-labelledby="access-title" hidden>
+      <h2 id="access-title" tabindex="-1">Acessibilidade</h2>
+      <div class="access-actions">
+        <button type="button" id="access-move" aria-describedby="access-move-help">Mover</button>
+        <button type="button" id="access-reset">Repor posição</button>
+        <button type="button" id="access-close">Fechar</button>
+      </div>
+      <p class="hint" id="access-move-help">Arrasta o botão «Mover» ou usa as setas quando esse botão tiver o foco.</p>
+      <h3>Última resposta do chat</h3>
+      <p id="access-answer">A resposta aparece aqui depois de enviares uma mensagem.</p>
+      <div class="access-actions">
+        <button type="button" id="access-read" disabled>Ouvir resposta</button>
+        <button type="button" id="access-stop" disabled>Parar leitura</button>
+      </div>
+      <p id="access-status" class="hint" role="status"></p>
+      <h3>Língua Gestual Portuguesa</h3>
+      <p class="hint">Vídeo educativo com intérprete. Para consultar um gesto por palavra, usa o dicionário. A tradução das respostas para LGP está por implementar.</p>
+      <button type="button" id="lgp-load" aria-expanded="false" aria-controls="lgp-media">Carregar vídeo do YouTube</button>
+      <div id="lgp-media" hidden></div>
+      <p><a href="https://estudoemcasaapoia.dge.mec.pt/destaque/interprete-de-lingua-gestual-portuguesa">Ver o vídeo na página original do EstudoEmCasa</a></p>
+      <p><a href="https://dclgp.dcitizens.eu/dictionary">Pesquisar gestos no Dicionário Geral de LGP</a></p>
+    </div>
+    <button type="button" id="access-toggle" aria-expanded="false" aria-controls="access-window">Acessibilidade</button>
+  </div>
   <script>
     const form = document.querySelector("#formulario");
     const input = document.querySelector("#mensagem");
     const status = document.querySelector("#estado");
     const replies = document.querySelector("#respostas");
     const send = form.querySelector('button[type="submit"]');
+
+    const access = document.querySelector("#access-tools");
+    const panel = document.querySelector("#access-window");
+    const toggle = document.querySelector("#access-toggle");
+    const move = document.querySelector("#access-move");
+    const answer = document.querySelector("#access-answer");
+    const read = document.querySelector("#access-read");
+    const stop = document.querySelector("#access-stop");
+    const accessStatus = document.querySelector("#access-status");
+    const loadVideo = document.querySelector("#lgp-load");
+    const media = document.querySelector("#lgp-media");
+    let lastAnswer = "";
+    let position = null;
+    let drag = null;
+    let activeSpeech = null;
+
+    function placeWindow(x, y) {
+      const edge = 8;
+      const maxX = Math.max(edge, document.documentElement.clientWidth - access.offsetWidth - edge);
+      const maxY = Math.max(edge, document.documentElement.clientHeight - access.offsetHeight - edge);
+      position = { x: Math.min(maxX, Math.max(edge, x)), y: Math.min(maxY, Math.max(edge, y)) };
+      Object.assign(access.style, { left: position.x + "px", top: position.y + "px", right: "auto", bottom: "auto" });
+    }
+
+    function resetPosition() {
+      position = null;
+      access.removeAttribute("style");
+    }
+
+    function stopReading() {
+      if (!activeSpeech) return;
+      activeSpeech = null;
+      window.speechSynthesis.cancel();
+      stop.disabled = true;
+    }
+
+    function showVideo(show) {
+      loadVideo.setAttribute("aria-expanded", String(show));
+      loadVideo.textContent = show ? "Fechar vídeo" : "Carregar vídeo do YouTube";
+      media.hidden = !show;
+      if (!show) {
+        media.replaceChildren();
+        return;
+      }
+      const frame = document.createElement("iframe");
+      frame.id = "lgp-player";
+      frame.title = "Vídeo educativo com intérprete de LGP, EstudoEmCasa";
+      frame.src = "https://www.youtube-nocookie.com/embed/0HyWA6QRdDs";
+      frame.allow = "fullscreen";
+      frame.allowFullscreen = true;
+      frame.referrerPolicy = "strict-origin-when-cross-origin";
+      media.append(frame);
+    }
+
+    function setAccessOpen(open) {
+      panel.hidden = !open;
+      toggle.setAttribute("aria-expanded", String(open));
+      if (position) placeWindow(position.x, position.y);
+      if (open) {
+        document.querySelector("#access-title").focus();
+      } else {
+        showVideo(false);
+        stopReading();
+        toggle.focus();
+      }
+    }
+
+    toggle.addEventListener("click", () => setAccessOpen(panel.hidden));
+    document.querySelector("#access-close").addEventListener("click", () => setAccessOpen(false));
+    document.querySelector("#access-reset").addEventListener("click", resetPosition);
+    loadVideo.addEventListener("click", () => showVideo(media.hidden));
+    const clampPosition = () => { if (position) placeWindow(position.x, position.y); };
+    addEventListener("resize", clampPosition);
+    new ResizeObserver(clampPosition).observe(access);
+
+    access.addEventListener("keydown", event => {
+      if (event.key === "Escape" && !panel.hidden) setAccessOpen(false);
+    });
+    move.addEventListener("keydown", event => {
+      const steps = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] };
+      if (!Object.hasOwn(steps, event.key)) return;
+      event.preventDefault();
+      const [dx, dy] = steps[event.key];
+      const { left, top } = access.getBoundingClientRect();
+      const step = event.shiftKey ? 48 : 16;
+      placeWindow(left + dx * step, top + dy * step);
+    });
+    move.addEventListener("pointerdown", event => {
+      if (!event.isPrimary || event.button !== 0) return;
+      const { left, top } = access.getBoundingClientRect();
+      drag = { id: event.pointerId, x: event.clientX - left, y: event.clientY - top };
+      move.setPointerCapture(event.pointerId);
+    });
+    move.addEventListener("pointermove", event => {
+      if (event.pointerId !== drag?.id) return;
+      placeWindow(event.clientX - drag.x, event.clientY - drag.y);
+    });
+    move.addEventListener("lostpointercapture", () => { drag = null; });
+
+    read.addEventListener("click", () => {
+      const speech = window.speechSynthesis;
+      const voice = speech?.getVoices().find(candidate =>
+        candidate.localService && candidate.lang.replace("_", "-").toLowerCase() === "pt-pt");
+      if (!voice || !window.SpeechSynthesisUtterance) {
+        accessStatus.textContent = "A leitura precisa de uma voz de português de Portugal disponível neste dispositivo. A resposta continua em texto.";
+        return;
+      }
+      stopReading();
+      const utterance = new SpeechSynthesisUtterance(lastAnswer);
+      utterance.lang = "pt-PT";
+      utterance.voice = voice;
+      activeSpeech = utterance;
+      stop.disabled = false;
+      accessStatus.textContent = "A ler a última resposta.";
+      const finish = message => {
+        if (activeSpeech !== utterance) return;
+        activeSpeech = null;
+        stop.disabled = true;
+        accessStatus.textContent = message;
+      };
+      utterance.onend = () => finish("");
+      utterance.onerror = () => finish("Não foi possível ler a resposta neste dispositivo.");
+      speech.speak(utterance);
+    });
+    stop.addEventListener("click", () => {
+      stopReading();
+      accessStatus.textContent = "Leitura parada.";
+      read.focus();
+    });
+
     for (const button of document.querySelectorAll("[data-exemplo]")) {
       button.addEventListener("click", () => {
         input.value = button.dataset.exemplo;
@@ -84,13 +267,18 @@
         const reply = document.createElement("li");
         reply.textContent = data.response;
         replies.append(reply);
+        stopReading();
+        lastAnswer = data.response;
+        answer.textContent = lastAnswer;
+        read.disabled = false;
+        accessStatus.textContent = "";
         input.value = "";
         status.textContent = "";
       } catch (error) {
         status.textContent = error.message || "Não foi possível contactar o serviço.";
       } finally {
         send.disabled = false;
-        input.focus();
+        if (panel.hidden || !access.contains(document.activeElement)) input.focus();
       }
     });
   </script>
