@@ -1,20 +1,20 @@
 # MPPT24 AGI Absoluta
 
-[Guia de leitura, infográfico e cuidados](GUIA.md)
-
 Protótipo de chat local do [MPPT24OS](https://github.com/mppt24/MPPT24OS). Tem uma calculadora, um conversor de unidades e respostas predefinidas por tema. Funciona sem chaves de API.
 
-[![MPPT24 AGI Absoluta. Protótipo de chat local com calculadora, conversões e respostas por temas.](docs/infografico.png)](docs/infografico.png)
+[Experimentar o chat](#experimentar) · [Ver o infográfico](#infogr%C3%A1fico) · [Guia de leitura e cuidados](GUIA.md)
 
 ## Experimentar
 
-Com Docker Engine 28 ou posterior e Docker Compose, executa na pasta do repositório:
+Precisas de Git, Docker Engine 28 ou posterior e Docker Compose. Num terminal, descarrega o código e arranca a aplicação.
 
 ```bash
+git clone https://github.com/mppt24/mppt24-agi-absoluta.git
+cd mppt24-agi-absoluta
 docker compose up --build --wait
 ```
 
-Abre [http://127.0.0.1:5013](http://127.0.0.1:5013). Podes escrever uma mensagem ou escolher um exemplo na página.
+Quando o comando terminar, abre o endereço local no computador onde arrancaste o Docker. [Abrir o chat local](http://127.0.0.1:5013) Podes escrever uma mensagem ou escolher um exemplo na página.
 
 | Experimenta | Resultado esperado |
 | --- | --- |
@@ -29,6 +29,10 @@ Para parar o serviço, usa `docker compose down`. Para consultar os registos, us
 O serviço foi preparado para utilização local e não tem autenticação. O Docker publica a porta em `127.0.0.1`. Em versões anteriores à 28.0.0, equipamentos no mesmo segmento de rede podem alcançar portas publicadas em localhost. [Nota do Docker](https://docs.docker.com/engine/network/port-publishing/#setting-the-default-bind-address-for-containers)
 
 Algumas mensagens e respostas ficam guardadas numa base SQLite local. O volume Docker conserva esse histórico quando paras os contentores. Evita introduzir dados privados no chat. As respostas por tema vêm de um conjunto local limitado e as integrações externas continuam em avaliação.
+
+## Infográfico
+
+[![MPPT24 AGI Absoluta. Protótipo de chat local com calculadora, conversões e respostas por temas.](docs/infografico.png)](docs/infografico.png)
 
 ## Desenvolvimento e testes
 
