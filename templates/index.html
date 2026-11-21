@@ -60,6 +60,13 @@
     .access-haptics { display: flex; align-items: center; gap: .65rem; margin: .5rem 0; min-height: 2.75rem; }
     #access-haptics { flex: none; width: 1.15rem; height: 1.15rem; accent-color: #9decce; }
     #access-answer { max-height: 8rem; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; }
+    #sign-language { display: block; width: 100%; min-height: 2.75rem; font: inherit; }
+    #access-window summary { cursor: pointer; padding-block: .5rem; }
+    #access-window details { margin-bottom: .5rem; }
+    .sign-figure { margin: .5rem 0; }
+    .sign-figure img, #lse-player { display: block; max-width: 100%; height: auto; }
+    .sign-figure figcaption { margin-top: .35rem; font-size: .85rem; }
+    #lse-player { width: 100%; aspect-ratio: 16 / 9; margin-block: .6rem; background: #10141a; }
     #lgp-player { display: block; width: 100%; aspect-ratio: 16 / 9; margin: .6rem 0; border: 0; }
   </style>
 </head>
@@ -116,12 +123,61 @@
       <p id="access-haptic-help" class="hint">Um toque curto assinala que a resposta está pronta.</p>
       <button type="button" id="access-haptic-test">Testar vibração</button>
       <p id="access-haptic-status" class="hint" role="status"></p>
-      <h3>Língua Gestual Portuguesa</h3>
-      <p class="hint">Vídeo educativo com intérprete. Para consultar um gesto por palavra, usa o dicionário. A tradução das respostas para LGP está por implementar.</p>
-      <button type="button" id="lgp-load" aria-expanded="false" aria-controls="lgp-media">Carregar vídeo do YouTube</button>
-      <div id="lgp-media" hidden></div>
-      <p><a href="https://estudoemcasaapoia.dge.mec.pt/destaque/interprete-de-lingua-gestual-portuguesa">Ver o vídeo na página original do EstudoEmCasa</a></p>
-      <p><a href="https://dclgp.dcitizens.eu/dictionary">Pesquisar gestos no Dicionário Geral de LGP</a></p>
+      <h3>Línguas gestuais</h3>
+      <label for="sign-language">Escolhe a língua gestual</label>
+      <select id="sign-language" aria-controls="sign-lgp sign-lse sign-bsl sign-libras">
+        <option value="lgp">Língua Gestual Portuguesa (LGP)</option>
+        <option value="lse">Língua de Sinais Espanhola (LSE)</option>
+        <option value="bsl">Língua Gestual Britânica (BSL)</option>
+        <option value="libras">Língua Brasileira de Sinais (Libras)</option>
+      </select>
+      <div id="sign-lgp" aria-labelledby="sign-lgp-title">
+        <h4 id="sign-lgp-title">Língua Gestual Portuguesa</h4>
+        <p class="hint">Consulta um gesto por palavra ou vê exemplos. A tradução das respostas do chat em LGP ainda está em desenvolvimento.</p>
+        <details>
+          <summary>Alfabeto manual para soletrar nomes</summary>
+          <figure class="sign-figure">
+            <img src="{{ url_for('static', filename='alfabeto-manual-lgp.jpg') }}" width="377" height="371" loading="lazy"
+                 alt="Quadro do alfabeto manual da LGP, com fotografias das posições das mãos associadas às letras.">
+            <figcaption><a href="https://commons.wikimedia.org/wiki/File:Alfabeto_Manual_LGP.jpg">Lúcia Carvalho, Wikimedia Commons</a> · domínio público</figcaption>
+          </figure>
+        </details>
+        <details>
+          <summary>Consultar seis gestos na Infopédia</summary>
+          <ul>
+            <li><a href="https://www.infopedia.pt/dicionarios/lingua-gestual/Ol%C3%A1">Olá</a></li>
+            <li><a href="https://www.infopedia.pt/dicionarios/lingua-gestual/bom%20dia">Bom dia</a></li>
+            <li><a href="https://www.infopedia.pt/dicionarios/lingua-gestual/obrigado">Obrigado</a></li>
+            <li><a href="https://www.infopedia.pt/dicionarios/lingua-gestual/desculpa">Desculpa</a></li>
+            <li><a href="https://www.infopedia.pt/dicionarios/lingua-gestual/SIM">Sim</a></li>
+            <li><a href="https://www.infopedia.pt/dicionarios/lingua-gestual/adeus">Adeus</a></li>
+          </ul>
+        </details>
+        <button type="button" id="lgp-load" aria-expanded="false" aria-controls="lgp-media">Carregar vídeo do YouTube</button>
+        <div id="lgp-media" hidden></div>
+        <ul>
+          <li><a href="https://estudoemcasaapoia.dge.mec.pt/destaque/interprete-de-lingua-gestual-portuguesa">Ver o vídeo na página original do EstudoEmCasa</a></li>
+          <li><a href="https://dclgp.dcitizens.eu/dictionary">Pesquisar gestos no Dicionário Geral de LGP</a></li>
+          <li><a href="https://www.hlt.inesc-id.pt/w/PE2LGP_Avatar">Ver as demonstrações do avatar PE2LGP do INESC-ID</a></li>
+        </ul>
+      </div>
+      <div id="sign-lse" aria-labelledby="sign-lse-title" hidden>
+        <h4 id="sign-lse-title">Língua de Sinais Espanhola</h4>
+        <p class="hint">Vê Mónica a usar LSE. É uma amostra da língua, independente das respostas do chat.</p>
+        <button type="button" id="lse-load" aria-expanded="false" aria-controls="lse-media">Carregar vídeo do Wikimedia Commons</button>
+        <div id="lse-media" hidden></div>
+        <p id="lse-status" class="hint" role="status"></p>
+        <p><a href="https://commons.wikimedia.org/wiki/File:WIKITONGUES-_M%C3%B3nica_signing_Spanish_Sign_Language.webm">Vídeo original de Wikitongues e Ana Laguna</a> · <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a></p>
+        <p><a href="https://www.fundacioncnse-dilse.org/">Consultar o dicionário DILSE da Fundação CNSE</a></p>
+      </div>
+      <div id="sign-bsl" aria-labelledby="sign-bsl-title" hidden>
+        <h4 id="sign-bsl-title">Língua Gestual Britânica</h4>
+        <p><a href="https://bslsignbank.ucl.ac.uk/">Consultar gestos e vídeos no BSL SignBank da UCL</a></p>
+      </div>
+      <div id="sign-libras" aria-labelledby="sign-libras-title" hidden>
+        <h4 id="sign-libras-title">Língua Brasileira de Sinais</h4>
+        <p><a href="https://www.gov.br/governodigital/pt-br/acessibilidade-e-usuario/vlibras/vlibras">Abrir as ferramentas VLibras do Governo do Brasil</a></p>
+      </div>
     </div>
     <button type="button" id="access-toggle" aria-expanded="false" aria-controls="access-window">Acessibilidade</button>
   </div>
@@ -147,6 +203,11 @@
     const hapticStatus = document.querySelector("#access-haptic-status");
     const loadVideo = document.querySelector("#lgp-load");
     const media = document.querySelector("#lgp-media");
+    const signLanguage = document.querySelector("#sign-language");
+    const signSections = ["lgp", "lse", "bsl", "libras"].map(code => document.querySelector("#sign-" + code));
+    const loadLse = document.querySelector("#lse-load");
+    const lseMedia = document.querySelector("#lse-media");
+    const lseStatus = document.querySelector("#lse-status");
     let lastAnswer = "";
     let position = null;
     let drag = null;
@@ -190,6 +251,34 @@
       media.append(frame);
     }
 
+    function showLse(show) {
+      loadLse.setAttribute("aria-expanded", String(show));
+      loadLse.textContent = show ? "Fechar vídeo em LSE" : "Carregar vídeo do Wikimedia Commons";
+      lseMedia.hidden = !show;
+      lseStatus.textContent = "";
+      if (!show) {
+        const player = lseMedia.querySelector("video");
+        if (player) {
+          player.pause();
+          player.removeAttribute("src");
+          player.load();
+        }
+        lseMedia.replaceChildren();
+        return;
+      }
+      const player = document.createElement("video");
+      player.id = "lse-player";
+      player.controls = true;
+      player.playsInline = true;
+      player.preload = "metadata";
+      player.setAttribute("aria-label", "Mónica a usar a Língua de Sinais Espanhola");
+      player.addEventListener("error", () => {
+        lseStatus.textContent = "O vídeo não abriu neste navegador. Usa a ligação para o vídeo original.";
+      });
+      player.src = "https://upload.wikimedia.org/wikipedia/commons/d/d4/WIKITONGUES-_M%C3%B3nica_signing_Spanish_Sign_Language.webm";
+      lseMedia.append(player);
+    }
+
     function setAccessOpen(open) {
       panel.hidden = !open;
       toggle.setAttribute("aria-expanded", String(open));
@@ -198,6 +287,7 @@
         document.querySelector("#access-title").focus();
       } else {
         showVideo(false);
+        showLse(false);
         stopReading();
         toggle.focus();
       }
@@ -207,6 +297,12 @@
     document.querySelector("#access-close").addEventListener("click", () => setAccessOpen(false));
     document.querySelector("#access-reset").addEventListener("click", resetPosition);
     loadVideo.addEventListener("click", () => showVideo(media.hidden));
+    loadLse.addEventListener("click", () => showLse(lseMedia.hidden));
+    signLanguage.addEventListener("change", () => {
+      showVideo(false);
+      showLse(false);
+      for (const section of signSections) section.hidden = section.id !== "sign-" + signLanguage.value;
+    });
     const clampPosition = () => { if (position) placeWindow(position.x, position.y); };
     addEventListener("resize", clampPosition);
     new ResizeObserver(clampPosition).observe(access);

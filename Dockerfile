@@ -10,6 +10,7 @@ RUN pip install --no-cache-dir -r requirements.txt && \
 
 COPY main.py knowledge.py ./
 COPY templates ./templates
+COPY static ./static
 
 USER mppt24
 EXPOSE 5013
