@@ -8,7 +8,10 @@ import random
 import string
 import math
 from datetime import datetime
-from flask import Flask, jsonify, render_template, request
+from pathlib import Path
+from subprocess import DEVNULL, SubprocessError, run
+from tempfile import TemporaryDirectory
+from flask import Flask, Response, jsonify, render_template, request
 
 from knowledge import normalizar, responder_topico
 import hashlib
@@ -480,6 +483,31 @@ def home():
 @app.get("/health")
 def health():
     return {"ok": True}
+
+
+@app.post("/voz")
+def voz():
+    data = request.get_json(silent=True)
+    text = data.get("text") if isinstance(data, dict) else None
+    if not isinstance(text, str) or not text.strip() or len(text) > 4000:
+        return jsonify(error="Envia entre 1 e 4000 caracteres para ler."), 400
+
+    try:
+        with TemporaryDirectory() as directory:
+            audio = Path(directory) / "resposta.wav"
+            run(
+                ["espeak-ng", "-v", "pt", "-b", "1", "-w", str(audio), "--stdin"],
+                input=text.encode("utf-8", errors="replace"),
+                stdout=DEVNULL,
+                stderr=DEVNULL,
+                check=True,
+                timeout=8,
+            )
+            content = audio.read_bytes()
+    except (OSError, SubprocessError):
+        return jsonify(error="A voz local do AGI está indisponível."), 503
+
+    return Response(content, mimetype="audio/wav", headers={"Cache-Control": "no-store"})
 
 
 GESTOS_LGP = {

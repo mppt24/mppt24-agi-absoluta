@@ -29,6 +29,8 @@
     #respostas { padding: 0; list-style: none; }
     #respostas li { margin-bottom: .5rem; border-inline-start: 2px solid #6dbca0; padding: .6rem .8rem; background: #10171d; white-space: pre-wrap; overflow-wrap: anywhere; }
     #estado { min-height: 1.5em; }
+    #chat-voice-player { display: block; width: 100%; margin-top: .65rem; }
+    #chat-voice-player[hidden] { display: none; }
     .reply-sign { display: block; margin-top: .5rem; }
     .choose-lgp { display: flex; align-items: center; gap: .65rem; min-height: 2.75rem; margin-top: .5rem; }
     #reply-lgp { flex: none; width: 1.15rem; height: 1.15rem; accent-color: #9decce; }
@@ -100,6 +102,14 @@
         </label>
       </form>
       <p class="hint" id="estado" role="status"></p>
+      <label class="choose-lgp">
+        <input type="checkbox" id="auto-read">
+        Ler novas respostas em voz alta
+      </label>
+      <button type="button" id="chat-read" disabled>Ouvir a última resposta</button>
+      <button type="button" id="chat-stop" disabled>Parar leitura</button>
+      <audio id="chat-voice-player" controls preload="none" aria-label="Leitor da última resposta" hidden></audio>
+      <p class="hint" id="chat-voice-status" role="status"></p>
     </section>
   </main>
 
@@ -235,6 +245,23 @@
     let position = null;
     let drag = null;
     let activeSpeech = null;
+    let audioRequest = null;
+    let audioUrl = null;
+    const autoRead = document.querySelector("#auto-read");
+    const chatRead = document.querySelector("#chat-read");
+    const chatStop = document.querySelector("#chat-stop");
+    const voicePlayer = document.querySelector("#chat-voice-player");
+    const chatVoiceStatus = document.querySelector("#chat-voice-status");
+
+    function setReading(reading) {
+      stop.disabled = !reading;
+      chatStop.disabled = !reading;
+    }
+
+    function voiceStatus(message) {
+      chatVoiceStatus.textContent = panel.hidden ? message : "";
+      accessStatus.textContent = panel.hidden ? "" : message;
+    }
 
     function placeWindow(x, y) {
       const edge = 8;
@@ -250,10 +277,24 @@
     }
 
     function stopReading() {
-      if (!activeSpeech) return;
-      activeSpeech = null;
-      window.speechSynthesis.cancel();
-      stop.disabled = true;
+      if (activeSpeech) {
+        activeSpeech = null;
+        window.speechSynthesis.cancel();
+      }
+      if (audioRequest) {
+        audioRequest.abort();
+        audioRequest = null;
+      }
+      if (audioUrl) {
+        const url = audioUrl;
+        audioUrl = null;
+        voicePlayer.pause();
+        voicePlayer.removeAttribute("src");
+        voicePlayer.load();
+        voicePlayer.hidden = true;
+        URL.revokeObjectURL(url);
+      }
+      setReading(false);
     }
 
     function showVideo(show) {
@@ -401,6 +442,7 @@
       const label = volume.value + "%";
       volumeValue.textContent = label;
       volume.setAttribute("aria-valuetext", label);
+      voicePlayer.volume = Number(volume.value) / 100;
     });
 
     if (typeof navigator.vibrate !== "function") {
@@ -417,37 +459,88 @@
         : "O navegador não confirmou o pedido de vibração.";
     });
 
-    read.addEventListener("click", () => {
+    async function playServerVoice() {
+      const request = new AbortController();
+      audioRequest = request;
+      setReading(true);
+      voiceStatus("A preparar a voz local do AGI.");
+      try {
+        const response = await fetch("/voz", {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({text: lastAnswer}),
+          signal: request.signal
+        });
+        if (!response.ok) throw new Error("Voz local indisponível");
+        const audio = await response.blob();
+        if (request.signal.aborted) return;
+        audioUrl = URL.createObjectURL(audio);
+        voicePlayer.src = audioUrl;
+        voicePlayer.volume = Number(volume.value) / 100;
+        voicePlayer.hidden = false;
+        try {
+          await voicePlayer.play();
+          if (!request.signal.aborted) voiceStatus("");
+        } catch {
+          if (!request.signal.aborted) voiceStatus("Áudio pronto. Usa Reproduzir no leitor junto ao chat.");
+        }
+      } catch {
+        if (!request.signal.aborted) {
+          setReading(false);
+          voiceStatus("A voz local está indisponível. A resposta está disponível em texto.");
+        }
+      } finally {
+        if (audioRequest === request) audioRequest = null;
+      }
+    }
+
+    function readLastAnswer() {
+      if (!lastAnswer) return;
+      stopReading();
       const speech = window.speechSynthesis;
       const voice = speech?.getVoices().find(candidate =>
         candidate.localService && candidate.lang.replace("_", "-").toLowerCase() === "pt-pt");
       if (!voice || !window.SpeechSynthesisUtterance) {
-        accessStatus.textContent = "A leitura precisa de uma voz de português de Portugal disponível neste dispositivo. A resposta continua em texto.";
+        playServerVoice();
         return;
       }
-      stopReading();
       const utterance = new SpeechSynthesisUtterance(lastAnswer);
       utterance.lang = "pt-PT";
       utterance.voice = voice;
       utterance.volume = Number(volume.value) / 100;
       activeSpeech = utterance;
-      stop.disabled = false;
-      accessStatus.textContent = "A ler a última resposta.";
-      const finish = message => {
+      setReading(true);
+      voiceStatus("A ler a última resposta.");
+      utterance.onend = () => {
         if (activeSpeech !== utterance) return;
         activeSpeech = null;
-        stop.disabled = true;
-        accessStatus.textContent = message;
+        setReading(false);
+        voiceStatus("");
       };
-      utterance.onend = () => finish("");
-      utterance.onerror = () => finish("Não foi possível ler a resposta neste dispositivo.");
+      utterance.onerror = () => {
+        if (activeSpeech !== utterance) return;
+        activeSpeech = null;
+        playServerVoice();
+      };
       speech.speak(utterance);
+    }
+    chatRead.addEventListener("click", readLastAnswer);
+    read.addEventListener("click", readLastAnswer);
+    autoRead.addEventListener("change", () => { if (!autoRead.checked) stopReading(); });
+    voicePlayer.addEventListener("ended", () => { setReading(false); });
+    voicePlayer.addEventListener("play", () => { setReading(true); });
+    voicePlayer.addEventListener("error", () => {
+      if (!audioUrl) return;
+      setReading(false);
+      voiceStatus("O áudio não abriu. A resposta continua em texto.");
     });
-    stop.addEventListener("click", () => {
+    function stopFromControls(button) {
       stopReading();
-      accessStatus.textContent = "Leitura parada.";
-      read.focus();
-    });
+      voiceStatus("Leitura parada.");
+      button.focus();
+    }
+    stop.addEventListener("click", () => stopFromControls(read));
+    chatStop.addEventListener("click", () => stopFromControls(chatRead));
 
     function replySignContent(gesture) {
       if (!gesture) {
@@ -500,10 +593,13 @@
         lastAnswer = data.response;
         answer.textContent = lastAnswer;
         read.disabled = false;
+        chatRead.disabled = false;
         if (haptics.checked) signalResponse();
         accessStatus.textContent = "";
         input.value = "";
         status.textContent = "";
+        voiceStatus("");
+        if (autoRead.checked) readLastAnswer();
       } catch (error) {
         status.textContent = error.message || "Não foi possível contactar o serviço.";
       } finally {

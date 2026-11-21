@@ -78,6 +78,28 @@ class TestIntegration(unittest.TestCase):
         greeting = self.app.post('/chat', json={"message": "Olá", "lgp": "true"}).json
         self.assertEqual(greeting, {"response": "Olá! Como estás?"})
 
+    def test_voice_rejects_invalid_or_large_text(self):
+        for payload in ({}, {"text": "  "}, {"text": 123}, {"text": "x" * 4001}):
+            with self.subTest(payload=type(payload.get("text"))):
+                self.assertEqual(self.app.post("/voz", json=payload).status_code, 400)
+
+    def test_voice_handles_missing_engine_and_serves_uncached_audio(self):
+        with patch("main.run", side_effect=FileNotFoundError):
+            self.assertEqual(self.app.post("/voz", json={"text": "Olá"}).status_code, 503)
+
+        def write_wave(command, **options):
+            self.assertEqual(options["input"], "Olá".encode("utf-8"))
+            self.assertEqual(command[:5], ["espeak-ng", "-v", "pt", "-b", "1"])
+            with open(command[6], "wb") as audio:
+                audio.write(b"RIFFtestWAVE")
+
+        with patch("main.run", side_effect=write_wave):
+            response = self.app.post("/voz", json={"text": "Olá"})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.mimetype, "audio/wav")
+        self.assertEqual(response.headers["Cache-Control"], "no-store")
+        self.assertEqual(response.data, b"RIFFtestWAVE")
+
     def test_api_multiple_requests(self):
         """Testa múltiplas requisições consecutivas"""
         test_messages = [

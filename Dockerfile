@@ -4,7 +4,9 @@ ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 \
 
 WORKDIR /app
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt && \
+RUN apt-get update && apt-get install -y --no-install-recommends espeak-ng && \
+    rm -rf /var/lib/apt/lists/* && \
+    pip install --no-cache-dir -r requirements.txt && \
     useradd --system --user-group mppt24 && \
     mkdir /app/data && chown mppt24:mppt24 /app/data
 
