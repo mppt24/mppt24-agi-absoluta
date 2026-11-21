@@ -99,6 +99,9 @@
     <div id="access-window" role="region" aria-labelledby="access-title" hidden>
       <h2 id="access-title" tabindex="-1">Acessibilidade</h2>
       <div class="access-actions">
+        <button type="button" id="access-open-lgp">Ver vídeo em LGP</button>
+      </div>
+      <div class="access-actions">
         <button type="button" id="access-move" aria-describedby="access-move-help">Mover</button>
         <button type="button" id="access-reset">Repor posição</button>
         <button type="button" id="access-close">Fechar</button>
@@ -158,6 +161,12 @@
         <button type="button" id="lgp-sample-load" aria-expanded="false" aria-controls="lgp-sample-media">Carregar amostra em LGP</button>
         <div id="lgp-sample-media" hidden></div>
         <p id="lgp-sample-status" class="hint" role="status"></p>
+        <p class="hint">O leitor mostra um resumo sincronizado em português. Podes ligá-lo ou desligá-lo nos controlos de legendas.</p>
+        <details>
+          <summary>Ler o resumo sem reproduzir o vídeo</summary>
+          <p>No Rock in Rio Lisboa, os concertos dos dois palcos principais tiveram interpretação em LGP. A reportagem mostra a interpretação em palco e a área reservada perto das colunas, onde se pode sentir a vibração da música.</p>
+          <p>Sofia Figueiredo explica a importância de receber as letras antecipadamente e de colocar as intérpretes num sítio onde o público possa ver os gestos e os artistas ao mesmo tempo.</p>
+        </details>
         <p><a href="https://commons.wikimedia.org/wiki/File:L%C3%ADngua_Gestual_Portuguesa_chegou_aos_palcos_principais_do_Rock_In_Rio.webm">Reportagem original da Lusa</a> · <a href="https://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a></p>
         <button type="button" id="lgp-load" aria-expanded="false" aria-controls="lgp-media">Carregar vídeo do YouTube</button>
         <div id="lgp-media" hidden></div>
@@ -254,7 +263,7 @@
       media.append(frame);
     }
 
-    function bindSignPlayer(id, title, source) {
+    function bindSignPlayer(id, title, source, subtitles) {
       const button = document.querySelector("#" + id + "-load");
       const container = document.querySelector("#" + id + "-media");
       const message = document.querySelector("#" + id + "-status");
@@ -283,6 +292,19 @@
         player.addEventListener("error", () => {
           message.textContent = "O vídeo não abriu neste navegador. Usa a ligação para o vídeo original.";
         });
+        if (subtitles) {
+          player.crossOrigin = "anonymous";
+          const track = document.createElement("track");
+          track.kind = "subtitles";
+          track.srclang = "pt-PT";
+          track.label = "Português · resumo sincronizado";
+          track.src = subtitles;
+          track.default = true;
+          track.addEventListener("error", () => {
+            message.textContent = "As legendas não abriram. O resumo em texto continua disponível abaixo do leitor.";
+          });
+          player.append(track);
+        }
         player.src = source;
         container.append(player);
       }
@@ -293,7 +315,8 @@
     const closeLgpSample = bindSignPlayer(
       "lgp-sample",
       "Interpretação em Língua Gestual Portuguesa no Rock in Rio Lisboa, reportagem da Lusa",
-      "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/bc/L%C3%ADngua_Gestual_Portuguesa_chegou_aos_palcos_principais_do_Rock_In_Rio.webm/L%C3%ADngua_Gestual_Portuguesa_chegou_aos_palcos_principais_do_Rock_In_Rio.webm.480p.vp9.webm"
+      "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/bc/L%C3%ADngua_Gestual_Portuguesa_chegou_aos_palcos_principais_do_Rock_In_Rio.webm/L%C3%ADngua_Gestual_Portuguesa_chegou_aos_palcos_principais_do_Rock_In_Rio.webm.480p.vp9.webm",
+      {{ url_for("static", filename="lgp-rock-in-rio-resumo.pt.vtt") | tojson }}
     );
     const closeLseSample = bindSignPlayer(
       "lse",
@@ -325,6 +348,15 @@
       closeLgpSample();
       closeLseSample();
       for (const section of signSections) section.hidden = section.id !== "sign-" + signLanguage.value;
+    });
+    document.querySelector("#access-open-lgp").addEventListener("click", () => {
+      if (signLanguage.value !== "lgp") {
+        signLanguage.value = "lgp";
+        signLanguage.dispatchEvent(new Event("change"));
+      }
+      const button = document.querySelector("#lgp-sample-load");
+      if (button.getAttribute("aria-expanded") !== "true") button.click();
+      button.focus();
     });
     const clampPosition = () => { if (position) placeWindow(position.x, position.y); };
     addEventListener("resize", clampPosition);
