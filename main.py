@@ -482,6 +482,18 @@ def health():
     return {"ok": True}
 
 
+GESTOS_LGP = {
+    "ola": ("Olá!", "Ol%C3%A1"),
+    "bom dia": ("Bom dia!", "bom%20dia"),
+    "adeus": ("Adeus!", "adeus"),
+    "obrigado": ("Obrigado!", "obrigado"),
+    "desculpa": ("Desculpa!", "desculpa"),
+    "sim": ("Sim.", "SIM"),
+}
+CUMPRIMENTOS_LGP = {"ola", "bom dia", "adeus"}
+PEDIDO_GESTO = "mostra o gesto de "
+
+
 @app.route('/chat', methods=['POST'])
 def chat():
     data = request.get_json(silent=True)
@@ -489,8 +501,25 @@ def chat():
         return jsonify({'error': 'Envia uma mensagem de texto em JSON.'}), 400
     if len(data['message']) > 2000:
         return jsonify({'error': 'A mensagem pode ter até 2000 caracteres.'}), 400
-    response = processar_mensagem(data['message'])
-    return jsonify({'response': response})
+    message = data["message"]
+    normalized = normalizar(message)
+    lookup = normalized.startswith(PEDIDO_GESTO)
+    wants_sign = data.get("lgp") is True or lookup
+    if wants_sign:
+        term = normalized.removeprefix(PEDIDO_GESTO)
+        gesture = GESTOS_LGP.get(term) if lookup or term in CUMPRIMENTOS_LGP else None
+        if gesture:
+            response, entry = gesture
+            mppt24.salvar_conversa(message, response)
+            return jsonify(response=response, lgp={
+                "source": "Infopédia",
+                "url": "https://www.infopedia.pt/dicionarios/lingua-gestual/" + entry,
+            })
+
+    result = {"response": processar_mensagem(message)}
+    if wants_sign:
+        result["lgp"] = None
+    return jsonify(result)
 
 
 def processar_mensagem(mensagem):

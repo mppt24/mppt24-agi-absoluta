@@ -52,6 +52,32 @@ class TestIntegration(unittest.TestCase):
         self.assertIn('response', response_data)
         self.assertIn('Hidrogénio', response_data['response'])
 
+    def test_lgp_chat_returns_exact_video_for_greeting(self):
+        cases = [
+            ("Olá!", "Olá!", "Ol%C3%A1"),
+            ("bom dia", "Bom dia!", "bom%20dia"),
+            ("ADEUS", "Adeus!", "adeus"),
+        ]
+        for message, answer, entry in cases:
+            with self.subTest(message=message):
+                result = self.app.post('/chat', json={"message": message, "lgp": True})
+                self.assertEqual(result.status_code, 200)
+                self.assertEqual(result.json["response"], answer)
+                self.assertEqual(result.json["lgp"]["url"], "https://www.infopedia.pt/dicionarios/lingua-gestual/" + entry)
+
+    def test_lgp_chat_lookup_and_unavailable_response(self):
+        result = self.app.post('/chat', json={"message": "Mostra o gesto de obrigado"})
+        self.assertEqual(result.json["response"], "Obrigado!")
+        self.assertTrue(result.json["lgp"]["url"].endswith("/obrigado"))
+
+        plain = self.app.post('/chat', json={"message": "calcular 2+2"}).json
+        requested = self.app.post('/chat', json={"message": "calcular 2+2", "lgp": True}).json
+        self.assertNotIn("lgp", plain)
+        self.assertEqual(requested, {**plain, "lgp": None})
+
+        greeting = self.app.post('/chat', json={"message": "Olá", "lgp": "true"}).json
+        self.assertEqual(greeting, {"response": "Olá! Como estás?"})
+
     def test_api_multiple_requests(self):
         """Testa múltiplas requisições consecutivas"""
         test_messages = [

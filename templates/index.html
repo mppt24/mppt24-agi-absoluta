@@ -29,6 +29,9 @@
     #respostas { padding: 0; list-style: none; }
     #respostas li { margin-bottom: .5rem; border-inline-start: 2px solid #6dbca0; padding: .6rem .8rem; background: #10171d; white-space: pre-wrap; overflow-wrap: anywhere; }
     #estado { min-height: 1.5em; }
+    .reply-sign { display: block; margin-top: .5rem; }
+    .choose-lgp { display: flex; align-items: center; gap: .65rem; min-height: 2.75rem; margin-top: .5rem; }
+    #reply-lgp { flex: none; width: 1.15rem; height: 1.15rem; accent-color: #9decce; }
 
     body { padding-bottom: 5rem; }
     a { color: #a7e9ff; }
@@ -79,6 +82,7 @@
     <section aria-labelledby="chat">
       <h2 id="chat">Experimenta um exemplo</h2>
       <div class="examples" aria-label="Exemplos de perguntas">
+        <button type="button" data-exemplo="Mostra o gesto de olá">Experimentar uma resposta em LGP</button>
         <button type="button" data-exemplo="calcular sqrt(16)">Calcular uma raiz</button>
         <button type="button" data-exemplo="converter 1 hora em minutos">Converter tempo</button>
         <button type="button" data-exemplo="oxigénio">Consultar um tema</button>
@@ -90,6 +94,10 @@
           <input id="mensagem" name="mensagem" type="text" maxlength="2000" required autocomplete="off">
           <button type="submit">Enviar</button>
         </div>
+        <label class="choose-lgp">
+          <input type="checkbox" id="reply-lgp">
+          Respostas em LGP quando disponíveis
+        </label>
       </form>
       <p class="hint" id="estado" role="status"></p>
     </section>
@@ -109,6 +117,7 @@
       <p class="hint" id="access-move-help">Arrasta o botão «Mover» ou usa as setas quando esse botão tiver o foco.</p>
       <h3>Última resposta do chat</h3>
       <p id="access-answer">A resposta aparece aqui depois de enviares uma mensagem.</p>
+      <div id="access-reply-sign" hidden></div>
       <div class="access-actions">
         <button type="button" id="access-read" disabled>Ouvir resposta</button>
         <button type="button" id="access-stop" disabled>Parar leitura</button>
@@ -136,7 +145,7 @@
       </select>
       <div id="sign-lgp" aria-labelledby="sign-lgp-title">
         <h4 id="sign-lgp-title">Língua Gestual Portuguesa</h4>
-        <p class="hint">Consulta um gesto por palavra ou vê exemplos. A tradução das respostas do chat em LGP ainda está em desenvolvimento.</p>
+        <p class="hint">Consulta um gesto por palavra ou vê exemplos. As respostas com vídeo disponível mostram a ligação junto da própria mensagem.</p>
         <details>
           <summary>Alfabeto manual para soletrar nomes</summary>
           <figure class="sign-figure">
@@ -201,6 +210,8 @@
     const input = document.querySelector("#mensagem");
     const status = document.querySelector("#estado");
     const replies = document.querySelector("#respostas");
+    const replyLgp = document.querySelector("#reply-lgp");
+    const lastReplySign = document.querySelector("#access-reply-sign");
     const send = form.querySelector('button[type="submit"]');
 
     const access = document.querySelector("#access-tools");
@@ -438,6 +449,20 @@
       read.focus();
     });
 
+    function replySignContent(gesture) {
+      if (!gesture) {
+        const note = document.createElement("span");
+        note.textContent = "Ainda não há um vídeo em LGP para esta resposta.";
+        return note;
+      }
+      const link = document.createElement("a");
+      link.href = gesture.url;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.textContent = "Ver esta resposta em LGP na " + gesture.source + " (abre noutro separador)";
+      return link;
+    }
+
     for (const button of document.querySelectorAll("[data-exemplo]")) {
       button.addEventListener("click", () => {
         input.value = button.dataset.exemplo;
@@ -454,13 +479,23 @@
         const response = await fetch("/chat", {
           method: "POST",
           headers: {"Content-Type": "application/json"},
-          body: JSON.stringify({message})
+          body: JSON.stringify({message, lgp: replyLgp.checked})
         });
         const data = await response.json();
         if (!response.ok) throw new Error(data.error || "O pedido falhou.");
         const reply = document.createElement("li");
         reply.textContent = data.response;
+        const signRequested = Object.hasOwn(data, "lgp");
+        if (signRequested) {
+          const row = document.createElement("span");
+          row.className = "reply-sign";
+          row.append(replySignContent(data.lgp));
+          reply.append(row);
+        }
         replies.append(reply);
+        lastReplySign.replaceChildren();
+        lastReplySign.hidden = !signRequested;
+        if (signRequested) lastReplySign.append(replySignContent(data.lgp));
         stopReading();
         lastAnswer = data.response;
         answer.textContent = lastAnswer;

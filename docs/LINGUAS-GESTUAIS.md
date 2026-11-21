@@ -13,6 +13,12 @@ Abre **Acessibilidade** e escolhe uma língua. Cada opção mantém o seu nome e
 
 A soletração manual serve para representar letras. Um dicionário permite consultar gestos isolados. A tradução de uma frase exige que o significado e a gramática da língua de destino sejam preservados.
 
+## Respostas do chat com vídeo
+
+A opção **Respostas em LGP quando disponíveis** permite respostas curtas para «Olá», «Bom dia» e «Adeus». As seis entradas do painel também podem ser pedidas ao chat com «Mostra o gesto de …». O vídeo corresponde à resposta inteira desse caso. Como a Infopédia abre o vídeo no seu próprio leitor, o chat apresenta a ligação à página original. Só a escolha dessa ligação contacta o site.
+
+A aplicação mantém a resposta por extenso quando não existe um caso confirmado. A tradução de frases livres e a reprodução dos gestos dentro do AGI continuam por implementar.
+
 ## Código, modelos e integração
 
 | Projeto | Resultado da verificação |
