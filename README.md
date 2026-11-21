@@ -6,7 +6,9 @@ Protótipo de chat local do [MPPT24OS](https://github.com/mppt24/MPPT24OS). Tem 
 
 ## Experimentar
 
-Precisas de Git, Docker Engine 28 ou posterior e Docker Compose. Num terminal, descarrega o código e arranca a aplicação.
+Usa um computador com Git, Docker Engine 28 ou posterior e Docker Compose. No terminal, `git --version`, `docker version` e `docker compose version` ajudam a confirmar os requisitos. Em `docker version`, verifica a versão em **Server**. Se estiveres a navegar pelo telemóvel, podes ler os [exemplos do chat](#exemplos-do-chat) e ver o [infográfico](#infogr%C3%A1fico) antes de instalar.
+
+Se já tens o código, abre a sua pasta e executa apenas a última linha. Para uma primeira utilização, executa as três linhas pela ordem apresentada.
 
 ```bash
 git clone https://github.com/mppt24/mppt24-agi-absoluta.git
@@ -14,7 +16,9 @@ cd mppt24-agi-absoluta
 docker compose up --build --wait
 ```
 
-Quando o comando terminar, abre o endereço local no computador onde arrancaste o Docker. [Abrir o chat local](http://127.0.0.1:5013) Podes escrever uma mensagem ou escolher um exemplo na página.
+Quando o comando terminar, abre o chat no computador onde arrancaste o Docker e escolhe um dos exemplos. [Abrir o chat local](http://127.0.0.1:5013)
+
+### Exemplos do chat
 
 | Experimenta | Resultado esperado |
 | --- | --- |
@@ -22,7 +26,13 @@ Quando o comando terminar, abre o endereço local no computador onde arrancaste 
 | `converter 1 hora em minutos` | `60 minutos` |
 | `oxigénio` | Resposta predefinida sobre o elemento 8 |
 
-Para parar o serviço, usa `docker compose down`. Para consultar os registos, usa `docker compose logs mppt24-agi`. Se a porta 5013 já estiver ocupada, usa `MPPT24_PORT=5014 docker compose up --build --wait` e abre a porta 5014 no navegador.
+### Se o chat não abrir
+
+- **O Docker não responde.** Confirma que `docker version` mostra as secções **Client** e **Server**.
+- **A página dá erro.** Dentro da pasta do projeto, verifica o estado com `docker compose ps` e lê as últimas mensagens com `docker compose logs --tail=30 mppt24-agi`.
+- **A porta 5013 está ocupada.** Executa `MPPT24_PORT=5014 docker compose up --build --wait`. [Abrir o chat na porta 5014](http://127.0.0.1:5014)
+
+Quando acabares, usa `docker compose down` na pasta do projeto para parar o serviço. Para testar a edição atual, usa a branch `main`. A tag histórica `v1.3.0` tem um erro de sintaxe confirmado.
 
 ### Limites do protótipo
 
