@@ -1,3 +1,5 @@
+<div lang="pt-PT">
+
 # MPPT24 AGI Absoluta
 
 Protótipo de chat local do [MPPT24OS](https://github.com/mppt24/MPPT24OS). Tem uma calculadora, um conversor de unidades e respostas predefinidas por tema. Funciona sem chaves de API.
@@ -63,3 +65,5 @@ Para arrancar sem Docker, usa `python main.py` e abre a mesma página local. Os 
 - [Estado e evolução do projeto](docs/ROADMAP.md) e [histórico das versões](CHANGELOG.md)
 
 Se encontrares um problema, inclui a versão usada, os passos para reproduzir e o resultado esperado. Usa mensagens de exemplo ao partilhar registos.
+
+</div>
