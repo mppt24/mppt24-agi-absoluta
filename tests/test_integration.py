@@ -15,7 +15,7 @@ from unittest.mock import patch
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 try:
-    from main import app, processar_mensagem
+    from main import app, mppt24, processar_mensagem
 except ImportError:
     print("Erro: Não foi possível importar main.py")
     sys.exit(1)
@@ -76,21 +76,23 @@ class TestIntegration(unittest.TestCase):
         """Testa tratamento de erros da API"""
         # Requisição sem dados
         response = self.app.post('/chat')
-        self.assertIn(response.status_code, [400, 500])
+        self.assertEqual(response.status_code, 400)
         
         # Requisição com JSON inválido
         response = self.app.post('/chat',
                                data='invalid json',
                                content_type='application/json')
-        self.assertIn(response.status_code, [400, 500])
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(self.app.post('/chat', json={'message': 42}).status_code, 400)
+        self.assertEqual(
+            self.app.post('/chat', json={'message': 'a' * 2001}).status_code,
+            400,
+        )
 
-    def test_cors_headers(self):
-        """Testa se os headers CORS estão configurados"""
-        response = self.app.get('/')
-        
-        # Verificar se permite CORS (pode não estar configurado em todos os endpoints)
-        # Este teste pode falhar se CORS não estiver configurado
-        pass
+    def test_health_endpoint(self):
+        response = self.app.get('/health')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.get_json(), {'ok': True})
 
     def test_static_files(self):
         """Testa se arquivos estáticos são servidos"""
@@ -171,22 +173,18 @@ class TestIntegration(unittest.TestCase):
         self.assertEqual(success_count, 5)
 
     def test_database_operations(self):
-        """Testa operações básicas de base de dados (se existir)"""
-        # Este teste assume que existe algum tipo de persistência
-        # Se não existir, pode ser ignorado
-        
-        try:
-            # Tentar processar uma mensagem que pode ser guardada
-            response1 = processar_mensagem("teste database")
-            self.assertIsNotNone(response1)
-            
-            # Processar outra mensagem
-            response2 = processar_mensagem("outro teste")
-            self.assertIsNotNone(response2)
-            
-        except Exception:
-            # Se não há base de dados, o teste passa
-            pass
+        pergunta = "teste base de dados"
+        resposta = processar_mensagem(pergunta)
+        fila = mppt24.conn.execute(
+            "SELECT pergunta, resposta FROM conversas ORDER BY id DESC LIMIT 1"
+        ).fetchone()
+        self.assertEqual(fila, (pergunta, resposta))
+
+    def test_generated_password_is_not_recorded(self):
+        consulta = "SELECT COUNT(*) FROM conversas"
+        antes = mppt24.conn.execute(consulta).fetchone()
+        self.assertTrue(processar_mensagem("gerar senha").startswith("🔐"))
+        self.assertEqual(mppt24.conn.execute(consulta).fetchone(), antes)
 
     def test_edge_cases(self):
         """Testa casos extremos"""

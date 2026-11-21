@@ -143,3 +143,6 @@ screenshots/
 logs/
 temp/
 
+
+# Histórico local do chat
+mppt24_absoluta.db*
