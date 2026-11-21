@@ -54,6 +54,11 @@
     .access-actions { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .65rem; }
     #access-move { touch-action: none; cursor: grab; }
     #access-move:active { cursor: grabbing; }
+    .access-volume { margin-block: .75rem; }
+    .access-volume label { margin-bottom: .15rem; }
+    #access-volume { width: 100%; min-height: 2.75rem; padding: 0; accent-color: #9decce; }
+    .access-haptics { display: flex; align-items: center; gap: .65rem; margin: .5rem 0; min-height: 2.75rem; }
+    #access-haptics { flex: none; width: 1.15rem; height: 1.15rem; accent-color: #9decce; }
     #access-answer { max-height: 8rem; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; }
     #lgp-player { display: block; width: 100%; aspect-ratio: 16 / 9; margin: .6rem 0; border: 0; }
   </style>
@@ -98,7 +103,19 @@
         <button type="button" id="access-read" disabled>Ouvir resposta</button>
         <button type="button" id="access-stop" disabled>Parar leitura</button>
       </div>
+      <div class="access-volume">
+        <label for="access-volume">Volume da voz <output id="access-volume-value" aria-hidden="true">100%</output></label>
+        <input id="access-volume" type="range" min="0" max="100" step="5" value="100" aria-valuetext="100%">
+      </div>
       <p id="access-status" class="hint" role="status"></p>
+      <h3>Aviso por vibração</h3>
+      <label class="access-haptics">
+        <input id="access-haptics" type="checkbox" aria-describedby="access-haptic-help">
+        Vibrar quando chega uma resposta
+      </label>
+      <p id="access-haptic-help" class="hint">Um toque curto assinala que a resposta está pronta.</p>
+      <button type="button" id="access-haptic-test">Testar vibração</button>
+      <p id="access-haptic-status" class="hint" role="status"></p>
       <h3>Língua Gestual Portuguesa</h3>
       <p class="hint">Vídeo educativo com intérprete. Para consultar um gesto por palavra, usa o dicionário. A tradução das respostas para LGP está por implementar.</p>
       <button type="button" id="lgp-load" aria-expanded="false" aria-controls="lgp-media">Carregar vídeo do YouTube</button>
@@ -123,6 +140,11 @@
     const read = document.querySelector("#access-read");
     const stop = document.querySelector("#access-stop");
     const accessStatus = document.querySelector("#access-status");
+    const volume = document.querySelector("#access-volume");
+    const volumeValue = document.querySelector("#access-volume-value");
+    const haptics = document.querySelector("#access-haptics");
+    const hapticTest = document.querySelector("#access-haptic-test");
+    const hapticStatus = document.querySelector("#access-haptic-status");
     const loadVideo = document.querySelector("#lgp-load");
     const media = document.querySelector("#lgp-media");
     let lastAnswer = "";
@@ -213,6 +235,26 @@
     });
     move.addEventListener("lostpointercapture", () => { drag = null; });
 
+    volume.addEventListener("input", () => {
+      const label = volume.value + "%";
+      volumeValue.textContent = label;
+      volume.setAttribute("aria-valuetext", label);
+    });
+
+    if (typeof navigator.vibrate !== "function") {
+      haptics.disabled = true;
+      hapticTest.disabled = true;
+      document.querySelector("#access-haptic-help").textContent = "A vibração está indisponível neste navegador.";
+    }
+    function signalResponse() {
+      return typeof navigator.vibrate === "function" && !document.hidden && navigator.vibrate(85);
+    }
+    hapticTest.addEventListener("click", () => {
+      hapticStatus.textContent = signalResponse()
+        ? "Pedido de vibração enviado. Verifica se sentiste um toque curto."
+        : "O navegador não confirmou o pedido de vibração.";
+    });
+
     read.addEventListener("click", () => {
       const speech = window.speechSynthesis;
       const voice = speech?.getVoices().find(candidate =>
@@ -225,6 +267,7 @@
       const utterance = new SpeechSynthesisUtterance(lastAnswer);
       utterance.lang = "pt-PT";
       utterance.voice = voice;
+      utterance.volume = Number(volume.value) / 100;
       activeSpeech = utterance;
       stop.disabled = false;
       accessStatus.textContent = "A ler a última resposta.";
@@ -271,6 +314,7 @@
         lastAnswer = data.response;
         answer.textContent = lastAnswer;
         read.disabled = false;
+        if (haptics.checked) signalResponse();
         accessStatus.textContent = "";
         input.value = "";
         status.textContent = "";
