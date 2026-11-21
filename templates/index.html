@@ -64,9 +64,9 @@
     #access-window summary { cursor: pointer; padding-block: .5rem; }
     #access-window details { margin-bottom: .5rem; }
     .sign-figure { margin: .5rem 0; }
-    .sign-figure img, #lse-player { display: block; max-width: 100%; height: auto; }
+    .sign-figure img, .sign-player { display: block; max-width: 100%; height: auto; }
     .sign-figure figcaption { margin-top: .35rem; font-size: .85rem; }
-    #lse-player { width: 100%; aspect-ratio: 16 / 9; margin-block: .6rem; background: #10141a; }
+    .sign-player { width: 100%; aspect-ratio: 16 / 9; margin-block: .6rem; background: #10141a; }
     #lgp-player { display: block; width: 100%; aspect-ratio: 16 / 9; margin: .6rem 0; border: 0; }
   </style>
 </head>
@@ -153,6 +153,12 @@
             <li><a href="https://www.infopedia.pt/dicionarios/lingua-gestual/adeus">Adeus</a></li>
           </ul>
         </details>
+        <h5>Interpretação em LGP ao vivo</h5>
+        <p class="hint">Reportagem da Lusa sobre o Rock in Rio Lisboa. Por volta dos 8 segundos, vê-se a intérprete em grande plano. Resumo em texto: os dois palcos principais tiveram interpretação dos concertos em LGP.</p>
+        <button type="button" id="lgp-sample-load" aria-expanded="false" aria-controls="lgp-sample-media">Carregar amostra em LGP</button>
+        <div id="lgp-sample-media" hidden></div>
+        <p id="lgp-sample-status" class="hint" role="status"></p>
+        <p><a href="https://commons.wikimedia.org/wiki/File:L%C3%ADngua_Gestual_Portuguesa_chegou_aos_palcos_principais_do_Rock_In_Rio.webm">Reportagem original da Lusa</a> · <a href="https://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a></p>
         <button type="button" id="lgp-load" aria-expanded="false" aria-controls="lgp-media">Carregar vídeo do YouTube</button>
         <div id="lgp-media" hidden></div>
         <ul>
@@ -205,9 +211,6 @@
     const media = document.querySelector("#lgp-media");
     const signLanguage = document.querySelector("#sign-language");
     const signSections = ["lgp", "lse", "bsl", "libras"].map(code => document.querySelector("#sign-" + code));
-    const loadLse = document.querySelector("#lse-load");
-    const lseMedia = document.querySelector("#lse-media");
-    const lseStatus = document.querySelector("#lse-status");
     let lastAnswer = "";
     let position = null;
     let drag = null;
@@ -251,33 +254,52 @@
       media.append(frame);
     }
 
-    function showLse(show) {
-      loadLse.setAttribute("aria-expanded", String(show));
-      loadLse.textContent = show ? "Fechar vídeo em LSE" : "Carregar vídeo do Wikimedia Commons";
-      lseMedia.hidden = !show;
-      lseStatus.textContent = "";
-      if (!show) {
-        const player = lseMedia.querySelector("video");
-        if (player) {
-          player.pause();
-          player.removeAttribute("src");
-          player.load();
+    function bindSignPlayer(id, title, source) {
+      const button = document.querySelector("#" + id + "-load");
+      const container = document.querySelector("#" + id + "-media");
+      const message = document.querySelector("#" + id + "-status");
+      const openLabel = button.textContent;
+      function setPlayer(open) {
+        button.setAttribute("aria-expanded", String(open));
+        button.textContent = open ? "Fechar vídeo" : openLabel;
+        container.hidden = !open;
+        message.textContent = "";
+        if (!open) {
+          const player = container.querySelector("video");
+          if (player) {
+            player.pause();
+            player.removeAttribute("src");
+            player.load();
+          }
+          container.replaceChildren();
+          return;
         }
-        lseMedia.replaceChildren();
-        return;
+        const player = document.createElement("video");
+        player.className = "sign-player";
+        player.controls = true;
+        player.playsInline = true;
+        player.preload = "metadata";
+        player.setAttribute("aria-label", title);
+        player.addEventListener("error", () => {
+          message.textContent = "O vídeo não abriu neste navegador. Usa a ligação para o vídeo original.";
+        });
+        player.src = source;
+        container.append(player);
       }
-      const player = document.createElement("video");
-      player.id = "lse-player";
-      player.controls = true;
-      player.playsInline = true;
-      player.preload = "metadata";
-      player.setAttribute("aria-label", "Mónica a usar a Língua de Sinais Espanhola");
-      player.addEventListener("error", () => {
-        lseStatus.textContent = "O vídeo não abriu neste navegador. Usa a ligação para o vídeo original.";
-      });
-      player.src = "https://upload.wikimedia.org/wikipedia/commons/d/d4/WIKITONGUES-_M%C3%B3nica_signing_Spanish_Sign_Language.webm";
-      lseMedia.append(player);
+      button.addEventListener("click", () => setPlayer(container.hidden));
+      return () => setPlayer(false);
     }
+
+    const closeLgpSample = bindSignPlayer(
+      "lgp-sample",
+      "Interpretação em Língua Gestual Portuguesa no Rock in Rio Lisboa, reportagem da Lusa",
+      "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/bc/L%C3%ADngua_Gestual_Portuguesa_chegou_aos_palcos_principais_do_Rock_In_Rio.webm/L%C3%ADngua_Gestual_Portuguesa_chegou_aos_palcos_principais_do_Rock_In_Rio.webm.480p.vp9.webm"
+    );
+    const closeLseSample = bindSignPlayer(
+      "lse",
+      "Mónica a usar a Língua de Sinais Espanhola",
+      "https://upload.wikimedia.org/wikipedia/commons/d/d4/WIKITONGUES-_M%C3%B3nica_signing_Spanish_Sign_Language.webm"
+    );
 
     function setAccessOpen(open) {
       panel.hidden = !open;
@@ -287,7 +309,8 @@
         document.querySelector("#access-title").focus();
       } else {
         showVideo(false);
-        showLse(false);
+        closeLgpSample();
+        closeLseSample();
         stopReading();
         toggle.focus();
       }
@@ -297,10 +320,10 @@
     document.querySelector("#access-close").addEventListener("click", () => setAccessOpen(false));
     document.querySelector("#access-reset").addEventListener("click", resetPosition);
     loadVideo.addEventListener("click", () => showVideo(media.hidden));
-    loadLse.addEventListener("click", () => showLse(lseMedia.hidden));
     signLanguage.addEventListener("change", () => {
       showVideo(false);
-      showLse(false);
+      closeLgpSample();
+      closeLseSample();
       for (const section of signSections) section.hidden = section.id !== "sign-" + signLanguage.value;
     });
     const clampPosition = () => { if (position) placeWindow(position.x, position.y); };

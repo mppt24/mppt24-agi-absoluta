@@ -6,7 +6,7 @@ Abre **Acessibilidade** e escolhe uma língua. Cada opção mantém o seu nome e
 
 | Língua | Recurso |
 | --- | --- |
-| LGP · Língua Gestual Portuguesa | Alfabeto manual local, seis entradas da Infopédia, Dicionário Geral de LGP, vídeo do EstudoEmCasa e demonstrações do avatar PE2LGP. |
+| LGP · Língua Gestual Portuguesa | Alfabeto manual local, seis entradas da Infopédia, Dicionário Geral de LGP, reportagem da Lusa com intérprete no leitor integrado, vídeo do EstudoEmCasa e demonstrações do avatar PE2LGP. |
 | LSE · Língua de Sinais Espanhola | Amostra gravada com Mónica, reproduzida no painel a partir do Wikimedia Commons, e Dicionário DILSE da Fundação CNSE. |
 | BSL · Língua Gestual Britânica | Dicionário e vídeos do BSL SignBank da University College London. |
 | Libras · Língua Brasileira de Sinais | Ligação às ferramentas VLibras do Governo do Brasil. |
@@ -29,3 +29,5 @@ Para publicar uma integração de tradução, é preciso confirmar a licença do
 
 - [Alfabeto Manual LGP](https://commons.wikimedia.org/wiki/File:Alfabeto_Manual_LGP.jpg), Lúcia Carvalho, Wikimedia Commons. Domínio público. O JPEG original é incluído sem alterações.
 - [Mónica a usar LSE](https://commons.wikimedia.org/wiki/File:WIKITONGUES-_M%C3%B3nica_signing_Spanish_Sign_Language.webm), Wikitongues e Ana Laguna. [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). O leitor carrega o vídeo original, sem edição.
+
+- [Interpretação em LGP no Rock in Rio Lisboa](https://commons.wikimedia.org/wiki/File:L%C3%ADngua_Gestual_Portuguesa_chegou_aos_palcos_principais_do_Rock_In_Rio.webm), Lusa, 2022. [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/). O painel usa a versão de 480p do Wikimedia Commons, com o áudio original e um resumo em texto.
