@@ -7,6 +7,14 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+### Base local validada
+
+A [base local publicada](https://github.com/mppt24/mppt24-agi-absoluta/commit/4cf07293f638a9ff68d6a89dc74071987d2153fb) inclui o novo arranque Docker, a calculadora, as conversões e a pesquisa por temas. Os 43 testes passaram na [verificação do GitHub](https://github.com/mppt24/mppt24-agi-absoluta/actions/runs/44917080077).
+
+### Aviso sobre uma tag histórica
+
+A tag `v1.3.0` tem um erro de indentação em `main.py` e não arranca. Para experimentar a base local validada, usa o commit indicado acima ou segue o [guia atual](GUIA.md).
+
 ### 🔄 Em Desenvolvimento
 - Sistema de plugins para extensibilidade
 - Suporte para múltiplos idiomas na interface
