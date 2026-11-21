@@ -8,12 +8,12 @@ Protótipo de chat local do [MPPT24OS](https://github.com/mppt24/MPPT24OS). Tem 
 
 Usa um computador com Git, Docker Engine 28 ou posterior e Docker Compose. No terminal, `git --version`, `docker version` e `docker compose version` ajudam a confirmar os requisitos. Em `docker version`, verifica a versão em **Server**. Se estiveres a navegar pelo telemóvel, podes ler os [exemplos do chat](#exemplos-do-chat) e ver o [infográfico](#infogr%C3%A1fico) antes de instalar.
 
-Se já tens o código, abre a sua pasta e executa apenas a última linha. Para uma primeira utilização, executa as três linhas pela ordem apresentada.
+Se já tens o código, abre a pasta do projeto e executa apenas a última linha. Para a primeira utilização, copia o bloco abaixo. O comando seguinte só corre se o anterior tiver terminado com sucesso.
 
 ```bash
-git clone https://github.com/mppt24/mppt24-agi-absoluta.git
-cd mppt24-agi-absoluta
-docker compose up --build --wait
+git clone https://github.com/mppt24/mppt24-agi-absoluta.git &&
+  cd mppt24-agi-absoluta &&
+  docker compose up --build --wait
 ```
 
 Quando o comando terminar, abre o chat no computador onde arrancaste o Docker e escolhe um dos exemplos. [Abrir o chat local](http://127.0.0.1:5013)
@@ -59,6 +59,7 @@ Para arrancar sem Docker, usa `python main.py` e abre a mesma página local. Os 
 
 - [Aplicação Flask](main.py), [respostas por tema](knowledge.py) e [interface](templates/index.html)
 - [Verificações no GitHub Actions](https://github.com/mppt24/mppt24-agi-absoluta/actions/workflows/ci.yml)
-- [Contribuir](CONTRIBUTING.md) e [licença MIT](LICENSE)
+- [Contribuir](CONTRIBUTING.md), [comunicar uma falha de segurança](SECURITY.md) e [licença MIT](LICENSE)
+- [Estado e evolução do projeto](docs/ROADMAP.md) e [histórico das versões](CHANGELOG.md)
 
 Se encontrares um problema, inclui a versão usada, os passos para reproduzir e o resultado esperado. Usa mensagens de exemplo ao partilhar registos.

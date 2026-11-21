@@ -21,6 +21,10 @@ A tag `v1.3.0` tem um erro de indentação em `main.py` e não arranca. Para exp
 - Integração com APIs externas para dados em tempo real
 - Sistema de cache Redis para melhor performance
 
+## Entradas históricas
+
+As entradas abaixo preservam o que foi registado nas versões anteriores. Para saber o que está disponível e validado agora, usa a secção «Base local validada», os [exemplos atuais](README.md#exemplos-do-chat) e a [página de estado e evolução](docs/ROADMAP.md).
+
 ## [1.0.0] - 2025-01-17
 
 ### ✨ Adicionado
